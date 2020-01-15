@@ -1,8 +1,9 @@
 module.exports = {
     env: {
-        browser: true,
+        node: true,
         commonjs: true,
-        es6: true
+        es6: true,
+        mocha: true
     },
     extends: [
         "eslint:recommended"
@@ -15,17 +16,9 @@ module.exports = {
         ecmaVersion: 2018
     },
     rules: {
-        semi: [
-            "warn",
-            "never"
-        ],
-        indent: [
-            "warn",
-            4
-        ],
-        quotes: [
-            "warn",
-            "double"
-        ]
+        semi: ["warn", "never"],
+        indent: ["warn", 4],
+        quotes: ["warn", "double"],
+        strict: ["error", "global"]
     }
 }

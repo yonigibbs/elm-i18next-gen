@@ -7,7 +7,7 @@
     "test": "mocha",
     "test-watch": "mocha --watch",
     "lint": "eslint **/*.js",
-    "lint-fix": "eslint **/*.js --fix"
+    "lint-fix": "eslint --fix **/*.js"
   },
   "author": "",
   "license": "ISC",

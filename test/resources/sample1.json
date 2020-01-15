@@ -1,0 +1,7 @@
+{
+  "hello": "Hello",
+  "greetings": {
+    "goodDay": "Good Day.",
+    "greetName": "Hi {{name}}"
+  }
+}
