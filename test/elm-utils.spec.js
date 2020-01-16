@@ -1,7 +1,7 @@
 "use strict"
 
-const expect = require("chai").expect
-const moduleNameFromPath = require("../src/elm-utils").moduleNameFromPath
+const {expect} = require("chai")
+const {moduleNameFromPath} = require("../src/elm-utils")
 
 describe("elm-utils", () => {
     describe("moduleNameFromPath", () => {
@@ -18,5 +18,7 @@ describe("elm-utils", () => {
         })
 
         // TODO: more tests, e.g. what about invalid files, files with no extensions, leading/trailing slashes, etc.
+
+        // TODO: tests for pathFromModuleName
     })
 })

@@ -1,21 +1,29 @@
 "use strict"
 
-const fs = require("fs")
-const path = require("path")
-const write = require("./writer")
-const build = require("./model-builder")
-const getFileManager = require("./file-manager")
+const executeCodeGeneration = require("./entry-point")
 
-// TODO: delete this
-const dir = "/tmp/i18n"
-if (fs.existsSync(dir))
-    fs.rmdirSync(dir)
-fs.mkdirSync(dir)
+const exitWithError = msg => {
+    console.log("\x1b[31m%s\x1b[0m", msg)
+    process.exit(1)
+}
 
-const source = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../test/resources/sample1.json")))
+const args = process.argv.slice(2)
 
-write(build(source), getFileManager())
+if (args.length === 2) {
+    const [sourceFile, targetFolder] = args
+    const result = executeCodeGeneration(sourceFile, targetFolder)
+    if (result.isError)
+        exitWithError(result.msg)
+    else
+        console.log("\x1b[32m%s\x1b[0m", result.msg)
+} else {
+    exitWithError(`I need two arguments to proceed:
+    
+1. The source file containing the JSON which has the text resource values.
+2. The target path
 
-console.log("hello")
+Please try again, supplying these arguments.`)
+}
 
-//generateCode("source", "writer")
+// Export this function so it can be unit tested
+module.exports = executeCodeGeneration
