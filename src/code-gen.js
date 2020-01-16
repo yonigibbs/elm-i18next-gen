@@ -4,10 +4,18 @@ const {pathFromModuleName} = require("./elm-utils")
 
 const buildFileStart = moduleName => `module ${moduleName} exposing (..)
 
-import I18Next exposing (Translations, t, tr)
+import I18Next exposing (Translations, t, tr, Curly)
 `
 
-const buildFunction = (functionName, parameters) => `
+const buildFunction = (functionName, parameters) =>
+    parameters && parameters.length > 0
+        ? `
+
+${functionName} : Translations -> ${parameters.map(_ => "String -> ").join("")}String
+${functionName} translations ${parameters.map(p => p + " ").join("")}=
+    tr translations Curly "${functionName}" [ ${parameters.map(p => `( "${p}", ${p} )`).join(", ")} ]
+`
+        : `
 
 ${functionName} : Translations -> String
 ${functionName} translations =
@@ -19,7 +27,7 @@ module.exports = model =>
     Object.keys(model).reduce((files, moduleName) => {
         // Loop round this module's keys, which are the function names, and build up this file's content...
         const fileContent = Object.keys(model[moduleName]).reduce(
-            (fileContent, functionName) => fileContent + buildFunction(functionName),
+            (fileContent, functionName) => fileContent + buildFunction(functionName, model[moduleName][functionName]),
             buildFileStart(moduleName)
         )
         // Return a clone of the passed in "files" (the reduce function's accumulator), adding the content of this module

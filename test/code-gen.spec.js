@@ -6,12 +6,28 @@ const generateCode = require("../src/code-gen")
 const {pathFromModuleName} = require("../src/elm-utils")
 
 describe("code-gen", () => {
-    it("should handle single file with one resources (no params)", () => test(
-        {Translations: {hello: "Hello"}},
+    it("handles single file with one resources (no params)", () => test(
+        {Translations: {hello: []}},
         {
             ["Translations"]: [`hello : Translations -> String
 hello translations =
     t translations "hello"`]
+        }))
+
+    it("handles single file with one resource (one param)", () => test(
+        {Translations: {"hello": ["name"]}},
+        {
+            ["Translations"]: [`hello : Translations -> String -> String
+hello translations name =
+    tr translations Curly "hello" [ ( "name", name ) ]`]
+        }))
+
+    it("handles single file with one resource (three params)", () => test(
+        {Translations: {"hello": ["firstname", "middlename", "lastname"]}},
+        {
+            ["Translations"]: [`hello : Translations -> String -> String -> String -> String
+hello translations firstname middlename lastname =
+    tr translations Curly "hello" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]`]
         }))
 })
 
@@ -30,7 +46,7 @@ const elmFunctionsArrayToString = elmFunctions => elmFunctions.reduce(
 
 const getFileStart = moduleName => `module ${moduleName} exposing (..)
 
-import I18Next exposing (Translations, t, tr)
+import I18Next exposing (Translations, t, tr, Curly)
 
 
 `

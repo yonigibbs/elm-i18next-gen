@@ -17,12 +17,17 @@ describe("entry-point", () => {
         expect(getAllFilesContent(rootPath)).to.deep.equal({
             "Translations.elm" : `module Translations exposing (..)
 
-import I18Next exposing (Translations, t, tr)
+import I18Next exposing (Translations, t, tr, Curly)
 
 
 hello : Translations -> String
 hello translations =
     t translations "hello"
+
+
+helloWithParams : Translations -> String -> String -> String -> String
+helloWithParams translations firstname middlename lastname =
+    tr translations Curly "helloWithParams" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]
 
 
 greetings : Translations -> String

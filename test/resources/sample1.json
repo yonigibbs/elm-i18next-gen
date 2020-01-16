@@ -1,5 +1,6 @@
 {
   "hello": "Hello",
+  "helloWithParams": "Hello {{firstname}} {{middlename}} {{lastname}}!",
   "greetings": {
     "goodDay": "Good Day.",
     "greetName": "Hi {{name}}"
