@@ -2,6 +2,8 @@
 
 const {pathFromModuleName} = require("./elm-utils")
 
+const unusedVarShouldBreakLint = null
+
 const buildFileStart = moduleName => `module ${moduleName} exposing (..)
 
 import I18Next exposing (Translations, t, tr, Curly)
