@@ -1,12 +1,12 @@
 "use strict"
 
-const fs = require("fs")
+const os = require("os")
 const path = require("path")
 const {expect} = require("chai")
 const writeFiles = require("../src/file-writer")
 const {clearOutFolder, getAllFilesContent} = require("./test-utils")
 
-const rootPath = "/tmp/i18n-unit-test/file-writer"
+const rootPath = path.join(os.tmpDir(), "i18n-unit-test/file-writer")
 
 describe("file-writer", () => {
 

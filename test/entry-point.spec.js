@@ -1,12 +1,13 @@
 "use strict"
 
 const {expect} = require("chai")
+const os = require("os")
 const path = require("path")
 const {clearOutFolder} = require("./test-utils")
 const executeCodeGeneration = require("../src/entry-point")
 const {getAllFilesContent} = require("./test-utils")
 
-const rootPath = "/tmp/i18n-unit-test/index"
+const rootPath = path.join(os.tmpDir(), "i18n-unit-test/index")
 
 describe("entry-point", () => {
 

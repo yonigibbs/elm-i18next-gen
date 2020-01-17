@@ -11,7 +11,7 @@ const buildFunction = (functionName, parameters) =>
     parameters && parameters.length > 0
         ? `
 
-${functionName} : Translations -> ${parameters.map(_ => "String -> ").join("")}String
+${functionName} : Translations -> ${parameters.map(() => "String -> ").join("")}String
 ${functionName} translations ${parameters.map(p => p + " ").join("")}=
     tr translations Curly "${functionName}" [ ${parameters.map(p => `( "${p}", ${p} )`).join(", ")} ]
 `
