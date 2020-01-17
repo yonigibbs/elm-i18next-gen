@@ -1,37 +1,31 @@
 "use strict"
 
-const {pathFromModuleName} = require("./elm-utils")
+const fs = require("fs")
+const path = require("path")
+const build = require("./model-builder")
+const generateCode = require("./code-builder")
+const writeFiles = require("./file-writer")
 
-const buildFileStart = moduleName => `module ${moduleName} exposing (..)
-
-import I18Next exposing (Translations, t, tr, Curly)
-`
-
-const buildFunction = (functionName, parameters) =>
-    parameters && parameters.length > 0
-        ? `
-
-${functionName} : Translations -> ${parameters.map(() => "String -> ").join("")}String
-${functionName} translations ${parameters.map(p => p + " ").join("")}=
-    tr translations Curly "${functionName}" [ ${parameters.map(p => `( "${p}", ${p} )`).join(", ")} ]
-`
-        : `
-
-${functionName} : Translations -> String
-${functionName} translations =
-    t translations "${functionName}"
-`
-
-module.exports = model =>
-    // Loop round the model's keys, which are the Elm modules...
-    Object.keys(model).reduce((files, moduleName) => {
-        // Loop round this module's keys, which are the function names, and build up this file's content...
-        const fileContent = Object.keys(model[moduleName]).reduce(
-            (fileContent, functionName) => fileContent + buildFunction(functionName, model[moduleName][functionName]),
-            buildFileStart(moduleName)
-        )
-        // Return a clone of the passed in "files" (the reduce function's accumulator), adding the content of this module
-        // as a new property whose key is the file name, and whose value is that file's code content (as a string).
-        const filename = pathFromModuleName(moduleName)
-        return {...files, [filename]: fileContent}
-    }, {})
+/**
+ * The main entry point for the whole code-generation process. Reads the supplied sourceFile, builds up a model representing
+ * the data in it, builds the code for this, and finally writes that code to the file system as the supplied targetFolder.
+ *
+ * Returns an object containing two properties:
+ * * `isError`: boolean defining whether the operation succeeded or was not executed for some reason (e.g. invalid inputs).
+ * * `msg`: an explanatory message
+ *
+ * Note that `isError` is used only for invalid inputs to this function. All other problems are handled simply by throwing
+ * an exception.
+ */
+module.exports = (sourceFile, targetFolder) => {
+    const resolvedSourceFile = path.resolve(sourceFile)
+    if (!fs.existsSync(resolvedSourceFile))
+        return {isError: true, msg: `The supplied source file does not exist: ${resolvedSourceFile}`}
+    else if (fs.lstatSync(resolvedSourceFile).isDirectory())
+        return {isError: true, msg: `The supplied source is a directory, not a file: ${resolvedSourceFile}`}
+    else {
+        const source = JSON.parse(fs.readFileSync(resolvedSourceFile, "utf8"))
+        writeFiles(path.resolve(targetFolder), generateCode(build(source)))
+        return {isError: false, msg: `Code generated at ${targetFolder}`}
+    }
+}

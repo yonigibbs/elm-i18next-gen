@@ -4,7 +4,7 @@ const {expect} = require("chai")
 const os = require("os")
 const path = require("path")
 const {clearOutFolder} = require("./test-utils")
-const executeCodeGeneration = require("../src/entry-point")
+const executeCodeGeneration = require("../src/code-gen")
 const {getAllFilesContent} = require("./test-utils")
 
 const rootPath = path.join(os.tmpDir(), "i18n-unit-test/index")

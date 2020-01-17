@@ -2,10 +2,10 @@
 
 const {expect} = require("chai")
 const {EOL} = require("os")
-const generateCode = require("../src/code-gen")
+const generateCode = require("../src/code-builder")
 const {pathFromModuleName} = require("../src/elm-utils")
 
-describe("code-gen", () => {
+describe("code-builder", () => {
     it("handles single file with one resources (no params)", () => test(
         {Translations: {hello: []}},
         {
