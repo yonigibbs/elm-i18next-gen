@@ -16,6 +16,7 @@ describe("entry-point", () => {
     it("generates sample file", () => {
         executeCodeGeneration(path.join(__dirname, "resources/sample1.json"), rootPath)
         expect(getAllFilesContent(rootPath)).to.deep.equal({
+            // Top level module
             "Translations.elm" : `module Translations exposing (..)
 
 import I18Next exposing (Translations, t, tr, Curly)
@@ -29,11 +30,22 @@ hello translations =
 helloWithParams : Translations -> String -> String -> String -> String
 helloWithParams translations firstname middlename lastname =
     tr translations Curly "helloWithParams" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]
+`,
+
+            // Nested module
+            "Translations/Greetings.elm" : `module Translations.Greetings exposing (..)
+
+import I18Next exposing (Translations, t, tr, Curly)
 
 
-greetings : Translations -> String
-greetings translations =
-    t translations "greetings"
+goodDay : Translations -> String
+goodDay translations =
+    t translations "goodDay"
+
+
+greetName : Translations -> String -> String
+greetName translations name =
+    tr translations Curly "greetName" [ ( "name", name ) ]
 `
         })
     })
