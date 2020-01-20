@@ -1,7 +1,8 @@
 "use strict"
 
-const {expect} = require("chai")
+const {expect, assert} = require("chai")
 const build = require("../src/model-builder")
+const JsonError = require("../src/json-error")
 
 describe("model-builder", () => {
     it("handles single file with one resources (no params)", () => {
@@ -82,4 +83,49 @@ describe("model-builder", () => {
             }
         })
     })
+
+    it("capitalises module names", () => {
+        expect(build({
+            test: "",
+            nested: {
+                test: "",
+                subNested: {
+                    test: "test"
+                }
+            }
+        })).to.deep.equal({
+            Translations: {test: []},
+            "Translations.Nested": {test: []},
+            "Translations.Nested.SubNested": {test: []}
+        })
+    })
+
+    it("trims white space around module names", () => {
+        expect(build({"  nested  ": {test: ""}})).to.deep.equal({"Translations.Nested": {test: []}})
+    })
+
+    it("removes white space in module names", () => {
+        expect(build({"  Nested  Sub    Module  ": {test: ""}})).to.deep.equal({"Translations.NestedSubModule": {test: []}})
+    })
+
+    it("capitalises separate words in module names", () => {
+        expect(build({"  nested  sub   module  ": {test: ""}})).to.deep.equal({"Translations.NestedSubModule": {test: []}})
+    })
+
+    it("ensures module name starts with alphabetic character", () => {
+        assert.throws(
+            () => build({"1xx": {test: ""}}),
+            JsonError,
+            "The supplied JSON file has a problem in it: 1xx is not a valid name for an Elm module. Please specify a name that starts with a letter."
+        )
+    })
+
+    it("ensures module name starts with alphabetic character (trimmed)", () => {
+        assert.throws(
+            () => build({"  1xx   ": {test: ""}}),
+            JsonError,
+            "The supplied JSON file has a problem in it: 1xx is not a valid name for an Elm module. Please specify a name that starts with a letter."
+        )
+    })
+
 })

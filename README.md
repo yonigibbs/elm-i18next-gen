@@ -64,9 +64,14 @@ or placeholders are changed).
 TODO
 
 ## TODO
-* Sanitise file/function/parameter names:
+* Sanitise module/file/function/parameter names:
   * Capitalisation.
-  * Check what elm-i18next does with non-standard parameters (e.g. spaces, non-standard chars, etc).
+  * Invalid characters.
+* When overwriting target folder, don't clear it all out: overwrite existing files, and delete existing ones that are no
+longer generated (i.e. delete text resources).
+* Revisit error handling/reporting: need custom error type for user-facing problems in JSON (as opposed to unexpected errors)?
+* Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage
+* Handle empty modules (no translations, maybe just nested submodules) - poss already done - needs tests
 * Handle duplicates (functions and modules).
 * Validation of supplied target folder:
   * Valid path, not a file, etc.

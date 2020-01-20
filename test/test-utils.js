@@ -1,13 +1,7 @@
 "use strict"
 
-const fs = require("fs")
+const fs = require("fs-extra")
 const path = require("path")
-
-const clearOutFolder = folderPath => {
-    if (fs.existsSync(folderPath))
-        fs.rmdirSync(folderPath, {recursive: true})
-    fs.mkdirSync(folderPath, {recursive: true})
-}
 
 const getAllFiles = parent =>
     fs.readdirSync(parent)
@@ -25,7 +19,6 @@ const getAllFilesContent = parent =>
     )
 
 module.exports = {
-    clearOutFolder,
     getAllFiles,
     getAllFilesContent
 }

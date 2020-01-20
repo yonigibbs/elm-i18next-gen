@@ -1,5 +1,7 @@
 "use strict"
 
+const JsonError = require("./json-error")
+
 /** The regular expression that finds parameters in a translated text. */
 const paramRegex = /{{(\S+?)}}/gm
 
@@ -18,7 +20,20 @@ const parseParams = translationText => {
     return params
 }
 
-const sourcePropKeyToModuleName = key => key.charAt(0).toUpperCase() + key.slice(1)
+const capitaliseFirstLetter = s => s.charAt(0).toUpperCase() + s.slice(1)
+
+/**
+ * Returns the module name to use for the passed in property in the source JSON. Sanitises the value (trims, removes
+ * white space, capitalises words, etc) and also validates (e.g. makes sure first char is a letter, as Elm modules must
+ * start with a letter).
+ */
+const sourcePropKeyToModuleName = key => {
+    const trimmedKey = key.trim()
+    const firstChar = trimmedKey.charAt(0)
+    if (!firstChar.match(/[a-z]/i))
+        throw new JsonError(`${trimmedKey} is not a valid name for an Elm module. Please specify a name that starts with a letter.`)
+    return key.split(/\s+/).map(word => word.trim()).filter(word => word).map(word => capitaliseFirstLetter(word)).join("")
+}
 
 /**
  * See documentation on default export below. Does what it says, but allowing the accumulated model and module name to be
@@ -39,7 +54,7 @@ const buildModel = (source, initialModel, moduleName) => Object.keys(source).red
 
 /**
  * Returns a model containing the data from the passed in source (which is the source JSON file, as an object). The
- * returned model contains one property per module (the name of the property is the name of the module, e.g. "Translation".
+ * returned model contains one property per module (the name of the property is the name of the module, e.g. "Translations".
  * The value of the property is itself an object containing one property per function (the property name matching the
  * function name). The property's value is an array containing the parameter names for that function.
  *
@@ -71,7 +86,7 @@ const buildModel = (source, initialModel, moduleName) => Object.keys(source).red
  *     }
  * ```
  *
- * Function and module names are sanitised. Any duplicate translations in a given module will cause an error to be thrown
- * as this is invalid in the source JSON file.
+ * Function, module and parameters names are sanitised. Any duplicate translations in a given module will cause an error
+ * to be thrown as this is invalid in the source JSON file.
  */
 module.exports = source => buildModel(source, {}, "Translations")

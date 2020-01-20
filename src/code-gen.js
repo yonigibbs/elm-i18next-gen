@@ -1,31 +1,37 @@
 "use strict"
 
-const fs = require("fs")
+const fs = require("fs-extra")
 const path = require("path")
 const build = require("./model-builder")
 const generateCode = require("./code-builder")
 const writeFiles = require("./file-writer")
+const UserError = require("./user-error")
 
 /**
  * The main entry point for the whole code-generation process. Reads the supplied sourceFile, builds up a model representing
  * the data in it, builds the code for this, and finally writes that code to the file system as the supplied targetFolder.
- *
- * Returns an object containing two properties:
- * * `isError`: boolean defining whether the operation succeeded or was not executed for some reason (e.g. invalid inputs).
- * * `msg`: an explanatory message
- *
- * Note that `isError` is used only for invalid inputs to this function. All other problems are handled simply by throwing
- * an exception.
  */
-module.exports = (sourceFile, targetFolder) => {
+module.exports = (sourceFile, targetFolder, overwrite = false) => {
     const resolvedSourceFile = path.resolve(sourceFile)
     if (!fs.existsSync(resolvedSourceFile))
-        return {isError: true, msg: `The supplied source file does not exist: ${resolvedSourceFile}`}
-    else if (fs.lstatSync(resolvedSourceFile).isDirectory())
-        return {isError: true, msg: `The supplied source is a directory, not a file: ${resolvedSourceFile}`}
-    else {
-        const source = JSON.parse(fs.readFileSync(resolvedSourceFile, "utf8"))
-        writeFiles(path.resolve(targetFolder), generateCode(build(source)))
-        return {isError: false, msg: `Code generated at ${targetFolder}`}
+        throw new UserError(`The supplied source file does not exist: ${resolvedSourceFile}`)
+    if (!fs.lstatSync(resolvedSourceFile).isFile())
+        throw new UserError(`The supplied source file is not a file: ${resolvedSourceFile}`)
+
+    const resolvedTargetFolder = path.resolve(targetFolder)
+    if(!fs.existsSync(resolvedTargetFolder))
+        // Path doesn't exist: create it
+        fs.mkdirpSync(resolvedTargetFolder)
+    else if (!fs.lstatSync(resolvedTargetFolder).isDirectory())
+        throw new UserError(`The supplied target folder is not a directory: ${resolvedTargetFolder}`)
+    else if (fs.readdirSync(resolvedTargetFolder).length > 0) {
+        // Target folder exists and has contents
+        if (overwrite)
+            fs.emptyDirSync(resolvedTargetFolder)
+        else
+            throw new UserError(`Specified target folder is not empty: ${resolvedTargetFolder}`)
     }
+
+    const source = JSON.parse(fs.readFileSync(resolvedSourceFile, "utf8"))
+    writeFiles(resolvedTargetFolder, generateCode(build(source)))
 }

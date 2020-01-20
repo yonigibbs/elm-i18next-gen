@@ -1,16 +1,17 @@
 "use strict"
 
+const fs = require("fs-extra")
 const os = require("os")
 const path = require("path")
 const {expect} = require("chai")
 const writeFiles = require("../src/file-writer")
-const {clearOutFolder, getAllFilesContent} = require("./test-utils")
+const {getAllFilesContent} = require("./test-utils")
 
 const rootPath = path.join(os.tmpDir(), "i18n-unit-test/file-writer")
 
 describe("file-writer", () => {
 
-    beforeEach(() => clearOutFolder(rootPath))
+    beforeEach(() => fs.emptyDirSync(rootPath))
 
     it("writes single file with single line", () => test({"test1.txt": "test"}))
 })

@@ -1,6 +1,6 @@
 "use strict"
 
-const fs = require("fs")
+const fs = require("fs-extra")
 const path = require("path")
 
 /**
@@ -10,8 +10,7 @@ module.exports = (rootPath, files) => {
     Object.keys(files).forEach(filename => {
         const fullFilePath = path.join(rootPath, filename)
         const dirname = path.dirname(fullFilePath)
-        if (!fs.existsSync(dirname))
-            fs.mkdirSync(dirname, {recursive: true})
+        fs.ensureDirSync(dirname)
         fs.writeFileSync(fullFilePath, files[filename])
     })
 }
