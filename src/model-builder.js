@@ -9,6 +9,12 @@ const caseFirstLetter = (s, caps) => {
     return casedFirstChar + s.slice(1)
 }
 
+/** The regular expression used to find illegal Elm characters (i.e. characters that aren't letters, numbers or underscores. */
+const illegalCharRegex = /[^\w]+/gi
+
+/** Returns a copy of the passed in string, with illegal chars (or a contiguous set of them) replaced by an underscore. */
+const removeIllegalChars = s => s.replace(illegalCharRegex, "_")
+
 /**
  * Returns a sanitised version of the passed in string. Trims it, removes white space, replaces illegal characters with
  * underscore, and capitalises the first letter of each words (potentially treating the first word differently based on
@@ -22,8 +28,11 @@ const caseFirstLetter = (s, caps) => {
 const sanitise = (unsanitised, casing) => {
     const trimmed = unsanitised.trim()
     const firstChar = trimmed.charAt(0)
+    if (!firstChar)
+        throw new JsonError("an entry with no ID was found.")
     if (!firstChar.match(/[a-z]/i))
         throw new JsonError(`'${trimmed}' is not a valid name for an Elm module/function/parameter. The first character must be a letter.`)
+
     return unsanitised
         .split(/\s+/) // Split by white space
         .map(word => word.trim()) // Trim each value
@@ -33,6 +42,7 @@ const sanitise = (unsanitised, casing) => {
             const caps = index > 0 || casing === "pascal"
             return caseFirstLetter(word, caps)
         })
+        .map(removeIllegalChars)
         .join("")
 }
 

@@ -350,14 +350,77 @@ describe("model-builder", () => {
                 })
             })
 
+            it("removes white space in function names", () => {
+                expect(build({"test  function  name": ""})).to.deep.equal({
+                    "Translations": [{
+                        elmName: "testFunctionName", jsonName: "test  function  name", parameters: []
+                    }]
+                })
+            })
+
+            it("removes white space in parameter names", () => {
+                expect(build({test: "some {{param  1  a}} {{param  2  b}} value"})).to.deep.equal({
+                    "Translations": [{
+                        elmName: "test", jsonName: "test", parameters: [
+                            {elmName: "param1A", jsonName: "param  1  a"},
+                            {elmName: "param2B", jsonName: "param  2  b"}
+                        ]
+                    }]
+                })
+            })
+
             it("ignores parameters with just white space", () => {
                 expect(build({"key": "some {{   \t   }} value"})).to.deep.equal({
                     Translations: [{elmName: "key", jsonName: "key", parameters: []}]
                 })
             })
+
+            it("allows empty translation", () => {
+                expect(build({test: ""})).to.deep.equal({
+                    "Translations": [{elmName: "test", jsonName: "test", parameters: []}]
+                })
+            })
+        })
+
+        describe("illegal character replacement", () => {
+            it("replaces illegal chacters in module name", () => {
+                expect(build({"A$.%:B": {test: ""}})).to.deep.equal({
+                    "Translations.A_B": [{elmName: "test", jsonName: "A$.%:B.test", parameters: []}]
+                })
+            })
+
+            it("replaces illegal chacters in function name", () => {
+                expect(build({"A$.%:B": ""})).to.deep.equal({
+                    "Translations": [{elmName: "a_B", jsonName: "A$.%:B", parameters: []}]
+                })
+            })
+
+            it("replaces illegal chacters in parameter name", () => {
+                expect(build({test: "test {{A$.%:B}} value"})).to.deep.equal({
+                    "Translations": [{
+                        elmName: "test", jsonName: "test", parameters: [{elmName: "a_B", jsonName: "A$.%:B"}]
+                    }]
+                })
+            })
         })
 
         describe("error handling", () => {
+            it("throws error if module name blank", () => {
+                assert.throws(
+                    () => build({"  ": {test: ""}}),
+                    JsonError,
+                    "The supplied JSON file has a problem in it: an entry with no ID was found."
+                )
+            })
+
+            it("throws error if function name blank", () => {
+                assert.throws(
+                    () => build({test: {"  ": ""}}),
+                    JsonError,
+                    "The supplied JSON file has a problem in it: an entry with no ID was found."
+                )
+            })
+
             it("throws error if module name starts with number", () => {
                 assert.throws(
                     () => build({"1xx": {test: ""}}),

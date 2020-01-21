@@ -64,10 +64,6 @@ or placeholders are changed).
 TODO
 
 ## TODO
-* Sanitise module/file/function/parameter names:
-  * Capitalisation.
-  * Invalid characters.
-  * JSON values that have dots in them: what does elm-i18next do?
 * When overwriting target folder, don't clear it all out: overwrite existing files, and delete existing ones that are no
 longer generated (i.e. delete text resources).
 * Revisit error handling/reporting: need custom error type for user-facing problems in JSON (as opposed to unexpected errors)?
