@@ -64,10 +64,8 @@ or placeholders are changed).
 TODO
 
 ## TODO
-* Revisit error handling/reporting: need custom error type for user-facing problems in JSON (as opposed to unexpected errors)?
-* Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage
-* Handle empty modules (no translations, maybe just nested submodules) - poss already done - needs tests
 * Handle duplicates (functions and modules).
+* Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage
 * Validation of supplied target folder:
   * Valid path, not a file, etc.
   * Take in arg for what to do if target folder already exists (and isn't empty)?

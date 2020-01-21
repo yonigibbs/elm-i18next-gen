@@ -1,0 +1,9 @@
+{
+  "emptyModule": {},
+  "moduleWithSubmodulesOnly": {
+    "greetings": {
+      "goodDay": "Good day.",
+      "emptyModule": {}
+    }
+  }
+}

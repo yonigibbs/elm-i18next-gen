@@ -2,7 +2,7 @@
   "hello": "Hello",
   "helloWithParams": "Hello {{firstname}} {{middlename}} {{lastname}}!",
   "greetings": {
-    "goodDay": "Good Day.",
+    "goodDay": "Good day.",
     "greetName": "Hi {{name}}"
   }
 }

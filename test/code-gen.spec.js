@@ -20,6 +20,11 @@ describe("code-gen", () => {
         expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
     })
 
+    it("ignores empty modules", () => {
+        executeCodeGeneration(path.join(__dirname, "resources/empty-modules.json"), targetFolder)
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(emptyModulesFileContent)
+    })
+
     it("rejects missing source file", () => {
         const sourceFile = path.join(__dirname, "resources/missing-file.json")
         assert.throws(
@@ -95,7 +100,9 @@ describe("code-gen", () => {
     })
 })
 
-/** An object containing the files with the Elm code expected to be generated for the sample JSON file. */
+/**
+ * An object containing the files with the Elm code expected to be generated for the sample JSON file.
+ */
 const sampleFileContent = {
     // Top level module
     "Translations.elm": `module Translations exposing (..)
@@ -127,5 +134,21 @@ goodDay translations =
 greetName : Translations -> String -> String
 greetName translations name =
     tr translations Curly "greetName" [ ( "name", name ) ]
+`
+}
+
+/**
+ * An object containing the files with the Elm code expected to be generated for the empty-modules JSON file.
+ */
+const emptyModulesFileContent = {
+    // Top level module
+    "Translations/ModuleWithSubmodulesOnly/Greetings.elm": `module Translations.ModuleWithSubmodulesOnly.Greetings exposing (..)
+
+import I18Next exposing (Translations, t, tr, Curly)
+
+
+goodDay : Translations -> String
+goodDay translations =
+    t translations "goodDay"
 `
 }

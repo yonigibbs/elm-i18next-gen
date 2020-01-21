@@ -136,7 +136,7 @@ const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.
  *       hello: "Hello",
  *       helloWithParams: "Hello {{first name}} {{middle name}} {{last name}}!",
  *       greetings: {
- *         "good day": "Good Day.",
+ *         "good day": "Good day.",
  *         "greet name": "Hi {{name}}"
  *       }
  *     }

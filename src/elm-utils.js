@@ -17,7 +17,7 @@ const moduleNameFromPath = filePath => {
  * Returns the path to use for a file containing the code for the passed in module. e.g. for `"Translations.Greetings"` the
  * returned value is `"Translations/Greetings.elm"`.
  */
-const pathFromModuleName = moduleName => moduleName.replace(".", path.sep) + ".elm"
+const pathFromModuleName = moduleName => moduleName.replace(/\./g, path.sep) + ".elm"
 
 module.exports = {
     moduleNameFromPath,
