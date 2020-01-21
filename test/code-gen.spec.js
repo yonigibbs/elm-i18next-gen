@@ -66,37 +66,47 @@ describe("code-gen", () => {
     })
 
     it("overwrites target folder if overwriting", () => {
-        // Create a folder (with children) which should be deleted as it's not in the new set of files.
-        const deletedFolder = path.join(targetFolder, "folder-which-should-be-deleted")
-        const deletedSubfolder = path.join(deletedFolder, "subfolder")
-        fs.mkdirpSync(deletedSubfolder, {recursive: true})
-        fs.writeFileSync(path.join(deletedFolder, "file1.txt"), "Test")
-        fs.writeFileSync(path.join(deletedSubfolder, "file2.txt"), "Test")
 
-        // Create a folderwhich should NOT be delete as there are files in the new set of files which will go in this
-        // folder. But create a further subfolder and file under it which WILL be deleted.
+        const createNestedFolderStructure = parent => {
+            const childFolder = path.join(parent, "child")
+            const grandchildFolder = path.join(childFolder, "grandchild")
+            fs.mkdirpSync(grandchildFolder, {recursive: true})
+            fs.writeFileSync(path.join(childFolder, "file1.txt"), "Test")
+            fs.writeFileSync(path.join(grandchildFolder, "file2.txt"), "Test")
+        }
+
+        const translationsFolder = path.join(targetFolder, "Translations")
+        const greetingsFolder = path.join(translationsFolder, "Greetings")
+        const furtherGreetingsFolder = path.join(greetingsFolder, "FurtherGreetings")
+        fs.mkdirpSync(furtherGreetingsFolder)
+
+        // Create some files which should be overwritten
         fs.writeFileSync(path.join(targetFolder, "Translations.elm"), "Test")
-        const submoduleFolder = path.join(targetFolder, "Translations")
-        fs.mkdirpSync(submoduleFolder)
-        fs.writeFileSync(path.join(submoduleFolder, "Greetings.elm"), "Test")
-        fs.writeFileSync(path.join(submoduleFolder, "should-be-deleted.txt-1"), "Test")
-        fs.writeFileSync(path.join(submoduleFolder, "should-be-deleted.txt-2"), "Test")
-        const deleteSubmoduleFolder = path.join(submoduleFolder, "should-be-deleted")
-        fs.mkdirpSync(deleteSubmoduleFolder)
-        fs.writeFileSync(path.join(deleteSubmoduleFolder, "should-be-deleted.txt-3"), "Test")
-        fs.writeFileSync(path.join(deleteSubmoduleFolder, "should-be-deleted.txt-4"), "Test")
+        fs.writeFileSync(path.join(translationsFolder, "Greetings.elm"), "Test")
+        fs.writeFileSync(path.join(greetingsFolder, "FurtherGreetings.elm"), "Test")
 
-        executeCodeGeneration(sourceFile, targetFolder, true)
-        expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
+        // Create a file and folder at the top level and make sure they aren't touched
+        fs.mkdirpSync(path.join(targetFolder, "SomethingElse"))
+        fs.writeFileSync(path.join(targetFolder, "SomethingElse.elm"), "Test")
 
-        // Also make sure the folders are exactly as we'd expect, i.e. there's only a Translations folder, which no other
-        // subfolders anywhere, as they should all have been deleted.
-        expect(fs.readdirSync(targetFolder)
-            .filter(f => fs.lstatSync(path.join(targetFolder, f)).isDirectory()))
-            .to.deep.equal(["Translations"])
-        expect(fs.readdirSync(submoduleFolder)
-            .filter(f => fs.lstatSync(path.join(submoduleFolder, f)).isDirectory()))
-            .to.be.empty
+        // Create a folder (with children) under "Translations" which SHOULD be deleted as it's not in the new set of files.
+        createNestedFolderStructure(translationsFolder)
+
+        // Create a folder (with children) under "Translations/Greetings" which SHOULD be deleted as it's not in the new set of files.
+        createNestedFolderStructure(greetingsFolder)
+
+        executeCodeGeneration( path.join(__dirname, "resources/nested-modules.json"), targetFolder, true)
+        expect(getAllFilesContent(targetFolder)).to.deep.equal({...nestedModulesFileContent, ["SomethingElse.elm"]: "Test"})
+
+        // Also make sure the folders are exactly as we'd expect (i.e. all folders we expected to delete have been deleted).
+        const ensureFolder = (folder, expectedSubfolders) =>
+            expect(fs.readdirSync(folder)
+                .filter(child => fs.lstatSync(path.join(folder, child)).isDirectory()))
+                .to.have.members(expectedSubfolders)
+
+        ensureFolder(targetFolder, ["Translations", "SomethingElse"])
+        ensureFolder(translationsFolder, ["Greetings"])
+        ensureFolder(greetingsFolder, [])
     })
 })
 
@@ -107,7 +117,7 @@ const sampleFileContent = {
     // Top level module
     "Translations.elm": `module Translations exposing (..)
 
-import I18Next exposing (Translations, t, tr, Curly)
+import I18Next exposing (Translations, t, tr, Delims(..))
 
 
 hello : Translations -> String
@@ -123,17 +133,17 @@ helloWithParams translations firstname middlename lastname =
     // Nested module
     "Translations/Greetings.elm": `module Translations.Greetings exposing (..)
 
-import I18Next exposing (Translations, t, tr, Curly)
+import I18Next exposing (Translations, t, tr, Delims(..))
 
 
 goodDay : Translations -> String
 goodDay translations =
-    t translations "goodDay"
+    t translations "greetings.goodDay"
 
 
 greetName : Translations -> String -> String
 greetName translations name =
-    tr translations Curly "greetName" [ ( "name", name ) ]
+    tr translations Curly "greetings.greetName" [ ( "name", name ) ]
 `
 }
 
@@ -141,14 +151,51 @@ greetName translations name =
  * An object containing the files with the Elm code expected to be generated for the empty-modules JSON file.
  */
 const emptyModulesFileContent = {
-    // Top level module
     "Translations/ModuleWithSubmodulesOnly/Greetings.elm": `module Translations.ModuleWithSubmodulesOnly.Greetings exposing (..)
 
-import I18Next exposing (Translations, t, tr, Curly)
+import I18Next exposing (Translations, t, tr, Delims(..))
 
 
 goodDay : Translations -> String
 goodDay translations =
-    t translations "goodDay"
+    t translations "moduleWithSubmodulesOnly.greetings.goodDay"
+`
+}
+
+/**
+ * An object containing the files with the Elm code expected to be generated for the nested-modules JSON file.
+ */
+const nestedModulesFileContent = {
+    // Top level module
+    "Translations.elm": `module Translations exposing (..)
+
+import I18Next exposing (Translations, t, tr, Delims(..))
+
+
+hello : Translations -> String
+hello translations =
+    t translations "hello"
+`,
+
+    // First level nested child
+    "Translations/Greetings.elm": `module Translations.Greetings exposing (..)
+
+import I18Next exposing (Translations, t, tr, Delims(..))
+
+
+goodDay : Translations -> String
+goodDay translations =
+    t translations "greetings.goodDay"
+`,
+
+    // Second level nested child
+    "Translations/Greetings/FurtherGreetings.elm": `module Translations.Greetings.FurtherGreetings exposing (..)
+
+import I18Next exposing (Translations, t, tr, Delims(..))
+
+
+anotherGreeting : Translations -> String
+anotherGreeting translations =
+    t translations "greetings.furtherGreetings.anotherGreeting"
 `
 }

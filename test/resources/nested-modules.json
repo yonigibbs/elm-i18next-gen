@@ -1,0 +1,9 @@
+{
+  "hello": "Hello",
+  "greetings": {
+    "goodDay": "Good day.",
+    "furtherGreetings": {
+      "anotherGreeting": "Another greeting."
+    }
+  }
+}

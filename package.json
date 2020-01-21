@@ -11,6 +11,9 @@
   },
   "author": "",
   "license": "ISC",
+  "bin": {
+    "elm-i18next-code-gen": "bin/elm-i18next-code-gen"
+  },
   "devDependencies": {
     "@types/chai": "^4.2.7",
     "@types/command-line-args": "^5.0.0",

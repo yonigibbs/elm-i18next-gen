@@ -7,25 +7,25 @@ const {pathFromModuleName} = require("./elm-utils")
  */
 const buildFileStart = moduleName => `module ${moduleName} exposing (..)
 
-import I18Next exposing (Translations, t, tr, Curly)
+import I18Next exposing (Translations, t, tr, Delims(..))
 `
 
 /**
  * Builds up the text of a function with the passed in name, containing the passed in parameters, if any.
  */
-const buildFunction = (functionName, parameters) =>
-    parameters && parameters.length > 0
+const buildFunction = fn =>
+    fn.parameters.length
         ? `
 
-${functionName} : Translations -> ${parameters.map(() => "String -> ").join("")}String
-${functionName} translations ${parameters.map(p => p.elmName + " ").join("")}=
-    tr translations Curly "${functionName}" [ ${parameters.map(p => `( "${p.jsonName}", ${p.elmName} )`).join(", ")} ]
+${fn.elmName} : Translations -> ${fn.parameters.map(() => "String -> ").join("")}String
+${fn.elmName} translations ${fn.parameters.map(p => p.elmName + " ").join("")}=
+    tr translations Curly "${fn.jsonName}" [ ${fn.parameters.map(p => `( "${p.jsonName}", ${p.elmName} )`).join(", ")} ]
 `
         : `
 
-${functionName} : Translations -> String
-${functionName} translations =
-    t translations "${functionName}"
+${fn.elmName} : Translations -> String
+${fn.elmName} translations =
+    t translations "${fn.jsonName}"
 `
 
 /**
@@ -38,7 +38,7 @@ module.exports = model =>
     Object.keys(model).reduce((files, moduleName) => {
         // model[moduleName] is an array of functions: loop round these and build up this file's content...
         const fileContent = model[moduleName].reduce(
-            (fileContent, fn) => fileContent + buildFunction(fn.elmName, fn.parameters),
+            (fileContent, fn) => fileContent + buildFunction(fn),
             buildFileStart(moduleName)
         )
         // Return a clone of the passed in "files" (the reduce function's accumulator), adding the content of this module

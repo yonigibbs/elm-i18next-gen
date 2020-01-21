@@ -64,6 +64,7 @@ or placeholders are changed).
 TODO
 
 ## TODO
+* Add comment at top of generated files to explain they are generated.
 * Handle duplicates (functions and modules).
 * Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage
 * Validation of supplied target folder:
@@ -72,8 +73,8 @@ TODO
 * Allow parameter delimiter to be configured (currently hard-coded to `Curly`).
 * Handle translations with fallbacks.
 * Allow to work with older versions of Node (which didn't have recursive folder creation).
-* Handle errors at top level? Or just let exceptions bubble up (and be displayed on the console)?
 * TODOs in the code.
+* Allow user more control over generated files (e.g. hard-coded default of "Translations" as top-level module).
 * Publish as NPM package?
 * Consider moving to TypeScript?
 

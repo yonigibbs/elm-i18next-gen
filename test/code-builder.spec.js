@@ -54,7 +54,7 @@ const elmFunctionsArrayToString = elmFunctions => elmFunctions.reduce(
 
 const getFileStart = moduleName => `module ${moduleName} exposing (..)
 
-import I18Next exposing (Translations, t, tr, Curly)
+import I18Next exposing (Translations, t, tr, Delims(..))
 
 
 `

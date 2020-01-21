@@ -43,7 +43,7 @@ const getArgs = () => {
 
     const args = parseArgs()
 
-    const missingArgs = commandLineOptions.filter(arg => !args[arg.name])
+    const missingArgs = commandLineOptions.filter(arg => arg.required && !args[arg.name])
     if (missingArgs.length > 0) {
         const isSingle = missingArgs.length === 1
         const errorMessage = `The following argument${isSingle ? " is" : "s are"} missing:
