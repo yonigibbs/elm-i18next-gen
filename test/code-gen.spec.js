@@ -60,10 +60,38 @@ describe("code-gen", () => {
             `Specified target folder is not empty: ${targetFolder}`)
     })
 
-    it("empties target folder if overwriting", () => {
-        fs.mkdirpSync(path.join(targetFolder, "some-folder"))
+    it("overwrites target folder if overwriting", () => {
+        // Create a folder (with children) which should be deleted as it's not in the new set of files.
+        const deletedFolder = path.join(targetFolder, "folder-which-should-be-deleted")
+        const deletedSubfolder = path.join(deletedFolder, "subfolder")
+        fs.mkdirpSync(deletedSubfolder, {recursive: true})
+        fs.writeFileSync(path.join(deletedFolder, "file1.txt"), "Test")
+        fs.writeFileSync(path.join(deletedSubfolder, "file2.txt"), "Test")
+
+        // Create a folderwhich should NOT be delete as there are files in the new set of files which will go in this
+        // folder. But create a further subfolder and file under it which WILL be deleted.
+        fs.writeFileSync(path.join(targetFolder, "Translations.elm"), "Test")
+        const submoduleFolder = path.join(targetFolder, "Translations")
+        fs.mkdirpSync(submoduleFolder)
+        fs.writeFileSync(path.join(submoduleFolder, "Greetings.elm"), "Test")
+        fs.writeFileSync(path.join(submoduleFolder, "should-be-deleted.txt-1"), "Test")
+        fs.writeFileSync(path.join(submoduleFolder, "should-be-deleted.txt-2"), "Test")
+        const deleteSubmoduleFolder = path.join(submoduleFolder, "should-be-deleted")
+        fs.mkdirpSync(deleteSubmoduleFolder)
+        fs.writeFileSync(path.join(deleteSubmoduleFolder, "should-be-deleted.txt-3"), "Test")
+        fs.writeFileSync(path.join(deleteSubmoduleFolder, "should-be-deleted.txt-4"), "Test")
+
         executeCodeGeneration(sourceFile, targetFolder, true)
         expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
+
+        // Also make sure the folders are exactly as we'd expect, i.e. there's only a Translations folder, which no other
+        // subfolders anywhere, as they should all have been deleted.
+        expect(fs.readdirSync(targetFolder)
+            .filter(f => fs.lstatSync(path.join(targetFolder, f)).isDirectory()))
+            .to.deep.equal(["Translations"])
+        expect(fs.readdirSync(submoduleFolder)
+            .filter(f => fs.lstatSync(path.join(submoduleFolder, f)).isDirectory()))
+            .to.be.empty
     })
 })
 
