@@ -7,7 +7,7 @@ const {pathFromModuleName} = require("../src/elm-utils")
 
 describe("code-builder", () => {
     it("handles single file with one resources (no params)", () => test(
-        {Translations: {hello: []}},
+        {Translations: [{elmName: "hello", jsonName: "hello", parameters: []}]},
         {
             ["Translations"]: [`hello : Translations -> String
 hello translations =
@@ -15,7 +15,7 @@ hello translations =
         }))
 
     it("handles single file with one resource (one param)", () => test(
-        {Translations: {"hello": ["name"]}},
+        {Translations: [{elmName: "hello", jsonName: "hello", parameters: [{elmName: "name", jsonName: "name"}]}]},
         {
             ["Translations"]: [`hello : Translations -> String -> String
 hello translations name =
@@ -23,7 +23,15 @@ hello translations name =
         }))
 
     it("handles single file with one resource (three params)", () => test(
-        {Translations: {"hello": ["firstname", "middlename", "lastname"]}},
+        {
+            Translations: [{
+                elmName: "hello", jsonName: "hello", parameters: [
+                    {elmName: "firstname", jsonName: "firstname"},
+                    {elmName: "middlename", jsonName: "middlename"},
+                    {elmName: "lastname", jsonName: "lastname"}
+                ]
+            }]
+        },
         {
             ["Translations"]: [`hello : Translations -> String -> String -> String -> String
 hello translations firstname middlename lastname =

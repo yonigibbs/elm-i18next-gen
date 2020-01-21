@@ -18,8 +18,8 @@ const buildFunction = (functionName, parameters) =>
         ? `
 
 ${functionName} : Translations -> ${parameters.map(() => "String -> ").join("")}String
-${functionName} translations ${parameters.map(p => p + " ").join("")}=
-    tr translations Curly "${functionName}" [ ${parameters.map(p => `( "${p}", ${p} )`).join(", ")} ]
+${functionName} translations ${parameters.map(p => p.elmName + " ").join("")}=
+    tr translations Curly "${functionName}" [ ${parameters.map(p => `( "${p.jsonName}", ${p.elmName} )`).join(", ")} ]
 `
         : `
 
@@ -36,9 +36,9 @@ ${functionName} translations =
 module.exports = model =>
     // Loop round the model's keys, which are the Elm modules...
     Object.keys(model).reduce((files, moduleName) => {
-        // Loop round this module's keys, which are the function names, and build up this file's content...
-        const fileContent = Object.keys(model[moduleName]).reduce(
-            (fileContent, functionName) => fileContent + buildFunction(functionName, model[moduleName][functionName]),
+        // model[moduleName] is an array of functions: loop round these and build up this file's content...
+        const fileContent = model[moduleName].reduce(
+            (fileContent, fn) => fileContent + buildFunction(fn.elmName, fn.parameters),
             buildFileStart(moduleName)
         )
         // Return a clone of the passed in "files" (the reduce function's accumulator), adding the content of this module
