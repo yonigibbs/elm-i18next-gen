@@ -84,7 +84,7 @@ describe("model-builder", () => {
         })
     })
 
-    it("capitalises module names", () => {
+    it("capitalises first letter of module names", () => {
         expect(build({
             test: "",
             nested: {
@@ -101,7 +101,21 @@ describe("model-builder", () => {
     })
 
     it("trims white space around module names", () => {
-        expect(build({"  nested  ": {test: ""}})).to.deep.equal({"Translations.Nested": {test: []}})
+        expect(build({
+            "  nested  ": {
+                test: "",
+                "   sub  nested   ": {
+                    test: "",
+                }
+            }
+        })).to.deep.equal({
+            "Translations.Nested": {
+                test: []
+            },
+            "Translations.Nested.SubNested": {
+                test: []
+            }
+        })
     })
 
     it("removes white space in module names", () => {
