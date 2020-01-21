@@ -53,7 +53,7 @@ describe("code-gen", () => {
     })
 
     it("rejects target folder if it's empty and not overwriting", () => {
-        fs.mkdirp(path.join(targetFolder, "some-folder"))
+        fs.mkdirpSync(path.join(targetFolder, "some-folder"))
         assert.throws(
             () => executeCodeGeneration(sourceFile, targetFolder),
             UserError,
@@ -61,7 +61,7 @@ describe("code-gen", () => {
     })
 
     it("empties target folder if overwriting", () => {
-        fs.mkdirp(path.join(targetFolder, "some-folder"))
+        fs.mkdirpSync(path.join(targetFolder, "some-folder"))
         executeCodeGeneration(sourceFile, targetFolder, true)
         expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
     })
