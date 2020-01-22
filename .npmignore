@@ -1,0 +1,6 @@
+.github/
+.idea/
+docs/
+test/
+.eslintrc.js
+.gitignore

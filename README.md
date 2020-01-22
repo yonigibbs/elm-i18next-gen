@@ -19,7 +19,8 @@ to slightly different use cases. For a recent project, I chose to use *elm-i18ne
 * I didn't want to have to rebuild and redeploy the client code every time translations for a new language were added.
 
 *elm-i18next* ticks all the boxes above. The one thing I wanted that the package didn't give me is compile-time checking
-of my code against the source JSON object. For example, the JSON object could contain this translation:
+of my code against the source JSON object containing the translations. For example, say the JSON object contains this
+translation:
 
     {
       "greetName": "Hi {{name}}"
@@ -36,9 +37,9 @@ However the following Elm code would also compile:
 There are two typos there, neither of which would be caught at compile time, leading to problems (though not exceptions:
 this is Elm after all :relaxed:) when the page is rendered.
 
-To solve this problem, the tool in this repo takes in a JSON file containing the translations which the system uses, and
-generates a function for each string value. That function itself simply calls the _i18next_ package. The code in the
-application itself then calls those generated functions rather than using the _i18next_ package directly.
+To solve this problem, the tool in this repo takes in a JSON file containing the translations, and generates a function
+for each string value. That function itself simply calls the _i18next_ package. The code in the application then calls
+those generated functions rather than using the _i18next_ package directly.
 
 Using the example above, the generated code for it would look as follows:
 
@@ -52,13 +53,12 @@ The application code would then have the following:
 
 Now if a developer types `gretName` the code won't compile. And as the placeholder `name` is now baked into the generated
 code, there isn't an opportunity for any mistakes there. Similarly if a new placeholder is added in the text: the
-generated function will now require two parameters instead of one so the update to the calling code will be spotted at
-compile time.
+generated function will now require two parameters instead of one so the required change to the calling code will be
+spotted at compile time.
 
-An important distinction to make here is that the generated code does not contain the actual translated value (e.g.
-`"Hi {{name}}"`). These values are still read from the source JSON object at runtime. This means that as new languages
-are added, or as string values are updated, the code doesn't have to change (unless of course the translation IDs change,
-or placeholders are changed). 
+An important point here is that the generated code does not contain the actual translated value (e.g. `"Hi {{name}}"`).
+These values are still read from the source JSON object at runtime. This means that as new languages are added, or as
+string values are updated, the code doesn't have to change (unless of course the translation IDs or placeholders change). 
 
 ## Usage
 TODO
