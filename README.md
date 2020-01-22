@@ -64,6 +64,7 @@ string values are updated, the code doesn't have to change (unless of course the
 TODO
 
 ## TODO
+* Tests for "watch"?
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?)
 * Add comment at top of generated files to explain they are generated.

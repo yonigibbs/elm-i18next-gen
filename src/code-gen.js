@@ -6,6 +6,7 @@ const build = require("./model-builder")
 const generateCode = require("./code-builder")
 const writeFiles = require("./file-writer")
 const UserError = require("./user-error")
+const JsonError = require("./json-error")
 
 /**
  * Deletes all items from the passed in `parentFolder` which aren't in the passed in `generatedFiles`.
@@ -37,6 +38,15 @@ const deleteRemovedItems = (parentFolder, generatedFiles, pathRelativeToRoot) =>
     })
 }
 
+/** Parses the passed in JSON file and returns its content. Errors in parsing are reported in a JsonError */
+const readSourceFile = filename => {
+    try {
+        return JSON.parse(fs.readFileSync(filename, "utf8"))
+    } catch (err){
+        throw new JsonError(`file could not be parsed: ${err.message}`)
+    }
+}
+
 /**
  * The main entry point for the whole code-generation process. Reads the supplied sourceFile, builds up a model representing
  * the data in it, builds the code for this, and finally writes that code to the file system as the supplied targetFolder.
@@ -58,7 +68,7 @@ module.exports = (sourceFile, targetFolder, overwrite = false) => {
         // Target folder exists and has contents and overwrite flag isn't set.
         throw new UserError(`Specified target folder is not empty: ${resolvedTargetFolder}`)
 
-    const source = JSON.parse(fs.readFileSync(resolvedSourceFile, "utf8"))
+    const source = readSourceFile(resolvedSourceFile)
     const files = generateCode(build(source))
 
     if (overwrite) {

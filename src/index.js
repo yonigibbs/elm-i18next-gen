@@ -6,6 +6,7 @@
 // Validates that two arguments are received and, if so, proceeds to call the function exported from "./code-gen" which
 // executes the whole process of code generation.
 
+const fs = require("fs-extra")
 const commandLineArgs = require("command-line-args")
 const {EOL} = require("os")
 const executeCodeGeneration = require("./code-gen")
@@ -22,9 +23,32 @@ const exitWithUserError = msg => {
 
 /** Definition of all the available command line arguments. */
 const commandLineOptions = [
-    {name: "source", alias: "s", type: String, required: true, description: "The source file containing the JSON which has the text resource values."},
-    {name: "target", alias: "t", type: String, required: true, description: "The target path (the folder in which the source files are to be generated)."},
-    {name: "overwrite", alias: "o", type: Boolean, description: "Ensures that if the target folder exists, it will be overwritten"}
+    {
+        name: "source",
+        alias: "s",
+        type: String,
+        required: true,
+        description: "The source file containing the JSON which has the text resource values."
+    },
+    {
+        name: "target",
+        alias: "t",
+        type: String,
+        required: true,
+        description: "The target path (the folder in which the source files are to be generated)."
+    },
+    {
+        name: "overwrite",
+        alias: "o",
+        type: Boolean,
+        description: "Ensures that if the target folder exists, it will be overwritten"
+    },
+    {
+        name: "watch",
+        alias: "w",
+        type: Boolean,
+        description: "Watches the source file for changes and regenerates the code whenever it does."
+    }
 ]
 
 /** Ensures the args are valid: throws UserError if they're not */
@@ -59,8 +83,38 @@ Please try again, supplying ${isSingle ? "this argument" : "these arguments"}.`
 
 try {
     const args = getArgs()
-    executeCodeGeneration(args.source,  args.target, args.overwrite)
-    console.log("\x1b[32m%s\x1b[0m", `Code generated at ${args.target}`)
+
+    const generate = () => executeCodeGeneration(args.source, args.target, args.overwrite)
+
+    if (args.watch) {
+        const writeResult = (msg = `Code generated at ${args.target}`, isSuccess = true) => {
+            console.clear()
+            // See here for colours: https://stackoverflow.com/a/41407246/10326373
+            console.log(`\x1b[3${isSuccess ? "2" : "1"}m%s\x1b[0m`, `${new Date().toLocaleTimeString()} -- ${msg}`)
+        }
+
+        const generateAndWrite = () => writeResult(generate())
+
+        // The first time just call this and, if it fails, let the exception be thrown meaning we won't watch (as a failure
+        // means there could be something so wrong we can't watch till we rerun with new args).
+        generateAndWrite()
+
+        // If we got here we ran once successfully, so now watch for file changes. From now, any errors are trapped and
+        // reported.
+        fs.watch(args.source, {}, eventType => {
+            if (eventType === "change") {
+                try {
+                    generateAndWrite()
+                } catch (err) {
+                    writeResult(err.message, false)
+                }
+            }
+        })
+
+    } else {
+        generate()
+        console.log("\x1b[32m%s\x1b[0m", `Code generated at ${args.target}\n`)
+    }
 } catch (err) {
     if (err instanceof UserError) {
         // Known error type indicating some problem in the input from the user (e.g. cmd-line mistake or error in the input
