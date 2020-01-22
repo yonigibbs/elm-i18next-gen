@@ -16,7 +16,7 @@ module.exports = (rootPath, files) => {
 
         // Before writing this content out read the existing content: if nothing's changed, don't write the content out
         // to avoid unnecessary changes in git, file dates, etc.
-        if (!fs.existsSync(fullFilePath) || fs.readFileSync(fullFilePath) != files[filename])
+        if (!fs.existsSync(fullFilePath) || fs.readFileSync(fullFilePath) !== files[filename])
             fs.writeFileSync(fullFilePath, files[filename])
     })
 }

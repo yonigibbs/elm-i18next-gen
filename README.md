@@ -64,9 +64,11 @@ string values are updated, the code doesn't have to change (unless of course the
 TODO
 
 ## TODO
+* Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
+(https://github.com/sindresorhus/trash ?)
 * Add comment at top of generated files to explain they are generated.
 * Handle duplicates (functions and modules).
-* Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage
+* Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage (or swap to commander?)
 * Validation of supplied target folder:
   * Valid path, not a file, etc.
   * Take in arg for what to do if target folder already exists (and isn't empty)?
