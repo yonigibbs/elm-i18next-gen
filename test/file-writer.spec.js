@@ -14,6 +14,8 @@ describe("file-writer", () => {
     beforeEach(() => fs.emptyDirSync(rootPath))
 
     it("writes single file with single line", () => test({"test1.txt": "test"}))
+
+    // TODO: more tests
 })
 
 const test = files => {
