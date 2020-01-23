@@ -72,7 +72,7 @@ run the following command, which will install it directly from this GitHub repo:
  
 
 ## Usage
-The tool can be directly using `npx` or by adding a new entry to the `scripts` section of `package.json` then using
+The tool can be run directly using `npx` or by adding a new entry to the `scripts` section of `package.json` then using
 `npm run`.
 
 To run with `npx` execute this at the root of your project:
@@ -96,18 +96,20 @@ Then execute this at the root of your project:
 
 ### Command-line Arguments
 In order to run, this tool requires two command-line arguments to be supplied:
-* `--source` (short form `-s`): The source file containing the JSON which has the text resource values.
-* `--target` (short form `-t`): The target path (the folder in which the source files are to be generated).
+* `--source` (short form `-s`): The source file containing the JSON which contains the translations.
+* `--target` (short form `-t`): The folder in which the source files are to be generated. Can be absolute or relative to
+current folder.
+
 Without these the tool cannot run.
 
 Optionally, the following arguments can also be supplied:
-* `--overwrite` (short form `-o`): Ensures that if the target folder exists, it will be overwritten. If this argument
-isn't supplied and the target folder exists and isn't empty, the process will abort.
+* `--overwrite` (short form `-o`): Ensures that if the any of the target files exist, they will be overwritten. If this
+argument isn't supplied and any of the target files exist, the process will abort.
 * `--watch` (short form `-w`): Watches the source file for changes and regenerates the code whenever it does.
 
-Below is an example, using `npx`, of running this tool with the arguments specified:
+Below is an example of running this tool using `npx`, including the arguments:
 
-    npx elm-i18next-code-gen --source translations/master.json --target src/elm --overwrite
+    npx elm-i18next-code-gen --source translations/master.json --target src --overwrite
 
 The tool can also be integrated into your regular build script. For example say you happen to be using
 [parcel](https://parceljs.org/) to bundle your build, and your `package.json` contains this:
@@ -129,13 +131,15 @@ This mode is useful when doing a lot of work on translations and wanting changes
 immediately available in the code. It can also give immediate feedback on what changes need to be made in the code if
 the translation file changes break the existing code. This is shown in the video below. Here 
 [parcel](https://parceljs.org/) is serving the app, ensuring the code is compiled as soon as any changes are made to it.
-Therefore when the translation file is update the code generation tool automatically updates the generated code, which
-causes parcel to rebundle the code. 
+Therefore when the translation file is updated the code generation tool automatically updates the generated code, which
+causes parcel to rebundle the app.
 
 ![Code generation demo video](docs/images/elm-18n-code-gen.gif)
 
 
 ## TODO
+* If running in watch mode, implicitly set overwrite to true?
+* Change logic for testing overwrite argument: should check for Translations.elm, and for Translations folder.
 * Create constants somewhere for duplicate Elm code, e.g. file template
 * Document code-generation handling of (sub)modules.
 * Update error handling in `watch` mode: if error is caused by JSON (rather than bad args), do allow watching to commence.

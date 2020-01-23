@@ -1,10 +1,7 @@
 "use strict"
 
-// The entry point to the CLI. Expects two parameters:
-// 1. The source file containing the JSON which has the text resource values. Can be absolute or relative to current folder.
-// 2. The target path (the folder in which the source files are to be generated). Can be absolute or relative to current folder.
-// Validates that two arguments are received and, if so, proceeds to call the function exported from "./code-gen" which
-// executes the whole process of code generation.
+// The entry point to the CLI. See commandLineOptions below for details of command line arguments.
+// Validates the arguments then calls the function exported from "./code-gen" which executes the whole code generation process.
 
 const fs = require("fs-extra")
 const commandLineArgs = require("command-line-args")
@@ -28,20 +25,20 @@ const commandLineOptions = [
         alias: "s",
         type: String,
         required: true,
-        description: "The source file containing the JSON which has the text resource values."
+        description: "The source file containing the JSON which contains the translations."
     },
     {
         name: "target",
         alias: "t",
         type: String,
         required: true,
-        description: "The target path (the folder in which the source files are to be generated)."
+        description: "The folder in which the source files are to be generated. Can be absolute or relative to current folder."
     },
     {
         name: "overwrite",
         alias: "o",
         type: Boolean,
-        description: "Ensures that if the target folder exists, it will be overwritten. If this argument isn't supplied and the target folder exists and isn't empty, the process will abort."
+        description: "Ensures that if the any of the target files exist, they will be overwritten. If this argument isn't supplied and any of the target files exist, the process will abort."
     },
     {
         name: "watch",
