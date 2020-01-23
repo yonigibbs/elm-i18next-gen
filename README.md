@@ -136,6 +136,7 @@ causes parcel to rebundle the code.
 
 
 ## TODO
+* Create constants somewhere for duplicate Elm code, e.g. file template
 * Document code-generation handling of (sub)modules.
 * Update error handling in `watch` mode: if error is caused by JSON (rather than bad args), do allow watching to commence.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
