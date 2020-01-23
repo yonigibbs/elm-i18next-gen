@@ -116,7 +116,7 @@ The tool can also be integrated into your regular build script. For example say 
 
     "scripts": {
       "build": "parcel build ...",
-      "code-gen-translations": "elm-i18next-code-gen -s translations/master.json -t src/elm -o"
+      "code-gen-translations": "elm-i18next-code-gen -s translations/master.json -t src -o"
 
 The `build` script can be updated to call `code-gen-translations` as follows: 
 
@@ -124,8 +124,8 @@ The `build` script can be updated to call `code-gen-translations` as follows:
 
 #### Watch Mode
 Activating `watch` mode by passing in `--watch` (or `-w`) keeps the tool running and watching the source file for changes.
-Whenever a change occurs, the code will be regenerated. It only makes sense to call this mode if you also specify
-`--overwrite` (or `-o`) otherwise it will fail every time after the first code generation.
+Whenever a change occurs, the code will be regenerated. Adding this argument implicitly sets `overwrite` to true,
+otherwise it would fail every time after the first code generation.
 
 This mode is useful when doing a lot of work on translations and wanting changes in the translation file to be made
 immediately available in the code. It can also give immediate feedback on what changes need to be made in the code if
@@ -139,7 +139,6 @@ causes parcel to rebundle the app.
 
 ## TODO
 * Change logic for testing overwrite argument: should check for Translations.elm, and for Translations folder.
-* If running in watch mode, implicitly set overwrite to true?
 * Add more info in readme:
   * Describe submodules
   * Describe overwriting
@@ -150,7 +149,7 @@ causes parcel to rebundle the app.
 * Handle duplicates (functions and modules).
 * Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage (or swap to commander?)
 * Validation of supplied target folder (valid path, not a file, etc.)
-* Tests for "watch"?
+* Tests for all cmd-line args/behaviour (e.g. watch).
 * Allow parameter delimiter to be configured (currently hard-coded to `Curly`).
 * Handle translations with fallbacks.
 * Allow to work with older versions of Node (which didn't have recursive folder creation).
@@ -180,4 +179,4 @@ Then, when prompted, select the `elm-i18next-code-gen` module:
 for his library, and for taking the time to chat about the idea of code generation for it.
 * Thanks to [Dillon Kearns](https://github.com/dillonkearns) for the original inspiration from his
 [elm-graphql](https://github.com/dillonkearns/elm-graphql) library (especially
-[this talk](https://www.youtube.com/watch?v=memIRXFSNkU) of his.
+[this talk](https://www.youtube.com/watch?v=memIRXFSNkU) of his).

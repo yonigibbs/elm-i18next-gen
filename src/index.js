@@ -8,6 +8,7 @@ const commandLineArgs = require("command-line-args")
 const {EOL} = require("os")
 const executeCodeGeneration = require("./code-gen")
 const UserError = require("./user-error")
+const JsonError = require("./json-error")
 
 /**
  * Reports a user-facing error by outputting the supplied message to the console in red, then exits the process with an
@@ -81,7 +82,7 @@ Please try again, supplying ${isSingle ? "this argument" : "these arguments"}.`
 try {
     const args = getArgs()
 
-    const generate = () => executeCodeGeneration(args.source, args.target, args.overwrite)
+    const generate = () => executeCodeGeneration(args.source, args.target, args.watch || args.overwrite)
 
     if (args.watch) {
         const writeResult = (msg = `Code generated at ${args.target}`, isSuccess = true) => {
@@ -90,18 +91,26 @@ try {
             console.log(`\x1b[3${isSuccess ? "2" : "1"}m%s\x1b[0m`, `${new Date().toLocaleTimeString()} -- ${msg}`)
         }
 
-        const generateAndWrite = () => writeResult(generate())
-
-        // The first time just call this and, if it fails, let the exception be thrown meaning we won't watch (as a failure
-        // means there could be something so wrong we can't watch till we rerun with new args).
-        generateAndWrite()
+        // The first time just call this and, if it fails with some argument indicating there was a problem with the
+        // parameters or the setup (i.e. anything that's _not_ a JsonError, and therefore not easily fixable by the user)
+        // rethrow the exception and don't start watching (as a failure means there could be something so wrong we can't
+        // watch till we rerun with new args).
+        try {
+            writeResult(generate())
+        } catch (err){
+            if (err instanceof JsonError)
+                writeResult(err.message, false)
+            else
+                // noinspection ExceptionCaughtLocallyJS
+                throw err
+        }
 
         // If we got here we ran once successfully, so now watch for file changes. From now, any errors are trapped and
         // reported.
         fs.watch(args.source, {}, eventType => {
             if (eventType === "change") {
                 try {
-                    generateAndWrite()
+                    writeResult(generate())
                 } catch (err) {
                     writeResult(err.message, false)
                 }
@@ -122,6 +131,3 @@ try {
         throw err
     }
 }
-
-// Export this function so it can be unit tested
-module.exports = executeCodeGeneration
