@@ -69,7 +69,12 @@ This package is not currently published to the npm registry, but hopefully will 
 run the following command, which will install it directly from this GitHub repo:
 
     npm install --save-dev https://github.com/yonigibbs/elm-i18next-code-gen.git
- 
+
+
+## Pre-requisites
+This tool only works on Node 12 or higher. It can be made to work on earlier versions if required: log an issue if you
+need this.
+
 
 ## Usage
 The tool can be run directly using `npx` or by adding a new entry to the `scripts` section of `package.json` then using
@@ -104,7 +109,8 @@ Without these the tool cannot run.
 
 Optionally, the following arguments can also be supplied:
 * `--overwrite` (short form `-o`): Ensures that if the any of the target files exist, they will be overwritten. If this
-argument isn't supplied and any of the target files exist, the process will abort.
+argument isn't supplied and any of the target files exist, the process will abort. See the [Overwriting](#overwriting)
+section below for further details.  
 * `--watch` (short form `-w`): Watches the source file for changes and regenerates the code whenever it does.
 
 Below is an example of running this tool using `npx`, including the arguments:
@@ -137,14 +143,54 @@ causes parcel to rebundle the app.
 ![Code generation demo video](docs/images/elm-18n-code-gen.gif)
 
 
+### Generated Code
+This tool will generate a file called `Translations.elm` in the specified `target` folder. In it, it will create a function
+for every string value in the source JSON. In the source JSON, however, not every key represents a string: some keys
+are used as parents to group together other string values:
+
+    {
+      "hello": "Hello",             <-- This is a string value
+      "greetings": {                <-- This is a grouping of string values
+        "goodDay": "Good day.",
+        "greetName": "Hi {{name}}"
+      }
+    }
+
+For every such "grouping", this tool will generate an Elm module. So for the example JSON above, the following structure
+will be generated in the `target` folder:
+
+* `Translations.elm`: contains the `hello` function.
+* `Translations/Greetings.elm`: a `Translations` folder will be created under the `target` folder, and this file will be
+put there. This file will contain the `goodDay` and `greetName` functions.
+
+Modules can be nested as deeply as desired.
+
+
+### Overwriting
+As explained above, the `overwrite` argument defines whether or not the code generation process should overwrite any
+existing files. If the `overwrite` flag isn't specified the logic is quite simple: the operation will only proceed if
+`Translations.elm` does not exist and the `Translations` folder doesn't exist (or is empty). If `overwrite` is specified
+and there are no submodules, again the logic is simple: the tool will simply overwrite that file. However if `overwrite`
+is specified and there are submodules, a complexity can arise...
+
+Taking the example JSON above, we saw that two files were generated: `Translations.elm` and `Translations/Greetings.elm`.
+Now imagine the `greetings` key in the source JSON was renamed to `welcomeMessages`. What should happen here? Obviously
+a file called `Translations/WelcomeMessages.elm` should be created, but what should happen to the previously generated
+`Translations/Greetings.elm`? Similarly, what if the `greetings` section in the JSON was completely removed? Now there's
+no need for the `Translations` folder at all, as there are no submodules to generate. So what should happen with the
+previously created `Translations` folder?
+
+The way the tool handles this is by deleting any files and folders previously generated in the `Translations` folder,
+if the newly supplied JSON no longer requires them. It also deletes the `Translations` folder itself if it's no longer
+required. Clearly this is potentially dangerous: files are being deleted! There's a [TODO](#todo) item noted below to
+change this: maybe just put the files in the trash can / waste bin / recycle bin instead.
+
+
 ## TODO
-* Add more info in readme:
-  * Describe submodules
-  * Describe overwriting
-* Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
-(https://github.com/sindresorhus/trash ?)
-* Add comment at top of generated files to explain they are generated.
+* Update GitHub actions to test on Windows as well as Linux.
 * Handle duplicates (functions and modules).
+* Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
+(https://github.com/sindresorhus/trash ?) Make this configurable via an arg?
 * Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage (or swap to commander?)
 * Validation of supplied target folder (valid path, not a file, etc.)
 * Tests for all cmd-line args/behaviour (e.g. watch).

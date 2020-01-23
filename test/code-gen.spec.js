@@ -9,8 +9,8 @@ const {getAllFilesContent} = require("./test-utils")
 const UserError = require("../src/user-error")
 const {buildFileStart} = require("../src/elm-utils")
 
-const sourceFile = path.join(__dirname, "resources/sample1.json")
-const targetFolder = path.join(os.tmpDir(), "i18n-unit-test/code-gen")
+const sourceFile = path.join(__dirname, "resources/sample.json")
+const targetFolder = path.join(os.tmpdir(), "i18n-unit-test/code-gen")
 
 describe("code-gen", () => {
 
@@ -77,9 +77,35 @@ describe("code-gen", () => {
             `Translations already exist in specified target: ${targetFolder}. Try again with the 'overwrite' flag?`)
     })
 
-    it("generates sample file", () => {
+    it("deletes Translations folder previously generated if no submodules exist", () => {
+        // Generate the code once, which will create a Translations folder with Greetings.elm inside it.
         executeCodeGeneration(sourceFile, targetFolder)
+
+        // Now regenerate using a source with no submodules, overwriting the previously generated items.
+        executeCodeGeneration(path.join(__dirname, "resources/no-sub-modules.json"), targetFolder, true)
+
+        // Ensure there's no Translations folder left.
+        expect(fs.existsSync(path.join(targetFolder, "Translations"))).to.be.false
+
+        // Ensure the generated structure is as expected
+        const expectedFileContent = {...sampleFileContent}
+        delete expectedFileContent["Translations/Greetings.elm"]
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedFileContent)
+    })
+
+    it("deletes module previously generated if no longer exists", () => {
+        // Generate the code once with the empty-modules file, which will create this structure:
+        //    Translations/ModuleWithSubmodulesOnly/Greetings
+        executeCodeGeneration(path.join(__dirname, "resources/empty-modules.json"), targetFolder)
+
+        // Now regenerate using the normal source, overwriting the previously generated items.
+        executeCodeGeneration(sourceFile, targetFolder, true)
+
+        // Make sure the results are as we expect.
         expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
+
+        // Ensure there's no Translations/ModuleWithSubmodulesOnly folder left.
+        expect(fs.existsSync(path.join(targetFolder, "Translations", "ModuleWithSubmodulesOnly"))).to.be.false
     })
 
     it("overwrites Translations file and folder if overwriting", () => {

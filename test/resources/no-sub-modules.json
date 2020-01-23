@@ -1,0 +1,4 @@
+{
+  "hello": "Hello",
+  "helloWithParams": "Hello {{firstname}} {{middlename}} {{lastname}}!"
+}

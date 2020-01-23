@@ -15,27 +15,32 @@ const JsonError = require("./json-error")
  * folders will go.
  */
 const deleteRemovedItems = (parentFolder, generatedFiles, pathRelativeToRoot) => {
-    fs.readdirSync(parentFolder).forEach(child => {
-        const fullChildPath = path.join(parentFolder, child)
-        if (fs.lstatSync(fullChildPath).isDirectory()) {
-            // Child is a directory: check if there are any files that are in it and, if not, delete the whole directory.
+    // First check if there are any generated items in this folder: if not, we can simply delete it.
+    if (Object.keys(generatedFiles).some(fileName => fileName.startsWith(pathRelativeToRoot + path.sep))){
+        fs.readdirSync(parentFolder).forEach(child => {
+            const fullChildPath = path.join(parentFolder, child)
+            if (fs.lstatSync(fullChildPath).isDirectory()) {
+                // Child is a directory: check if there are any files that are in it and, if not, delete the whole directory.
 
-            // Define the path that any generated file would start with if it's to be considered under this directory.
-            const generatedFilePrefix = pathRelativeToRoot + path.sep + child + path.sep
-            if (Object.keys(generatedFiles).some(fileName => fileName.startsWith(generatedFilePrefix)))
-                // There are some files we need to generate in this folder: keep it, but check inside it in case it has
-                // further children which should be deleted.
-                deleteRemovedItems(fullChildPath, generatedFiles, child)
-            else
-                fs.rmdirSync(fullChildPath, {recursive: true})
-        } else {
-            // Child is a file: check if this file is found in the passed in list of generated files.
-            const childFilePathRelativeToRoot = pathRelativeToRoot + path.sep + child
-            if (!Object.keys(generatedFiles).some(fileName => fileName === childFilePathRelativeToRoot))
-                // Can delete this file: it's not been generated.
-                fs.unlinkSync(fullChildPath)
-        }
-    })
+                // Define the path that any generated file would start with if it's to be considered under this directory.
+                const generatedFilePrefix = pathRelativeToRoot + path.sep + child + path.sep
+                if (Object.keys(generatedFiles).some(fileName => fileName.startsWith(generatedFilePrefix)))
+                    // There are some files we need to generate in this folder: keep it, but check inside it in case it has
+                    // further children which should be deleted.
+                    deleteRemovedItems(fullChildPath, generatedFiles, child)
+                else
+                    fs.rmdirSync(fullChildPath, {recursive: true})
+            } else {
+                // Child is a file: check if this file is found in the passed in list of generated files.
+                const childFilePathRelativeToRoot = pathRelativeToRoot + path.sep + child
+                if (!Object.keys(generatedFiles).some(fileName => fileName === childFilePathRelativeToRoot))
+                    // Can delete this file: it's not been generated.
+                    fs.unlinkSync(fullChildPath)
+            }
+        })
+    } else
+        // Nothing in this folder: delete it.
+        fs.rmdirSync(parentFolder, {recursive: true})
 }
 
 /** Parses the passed in JSON file and returns its content. Errors in parsing are reported in a JsonError */
@@ -87,11 +92,11 @@ module.exports = (sourceFile, targetFolder, overwrite = false) => {
     const files = generateCode(build(source))
 
     if (overwrite) {
-        const submodulesFolders = path.join(resolvedTargetFolder, "Translations")
-        if (fs.existsSync(submodulesFolders))
+        const submodulesFolder = path.join(resolvedTargetFolder, "Translations")
+        if (fs.existsSync(submodulesFolder))
             // Delete any files/folders which exist in the file system and which are no longer in the generated files,
             // but only in child folders.
-            deleteRemovedItems(submodulesFolders, files, "Translations")
+            deleteRemovedItems(submodulesFolder, files, "Translations")
     }
 
     writeFiles(resolvedTargetFolder, files)
