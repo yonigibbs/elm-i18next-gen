@@ -173,8 +173,8 @@ Then, when prompted, select the `elm-i18next-code-gen` module:
 
 
 ## Thanks
-* Thanks to [ChristophP](https://github.com/ChristophP), author of [elm-i18next](https://github.com/ChristophP/elm-i18next)
-for his library, and for taking the time to chat about the idea of code generation for it.
-* Thanks to [Dillon Kearns](https://github.com/dillonkearns) for the original inspiration from his
-[elm-graphql](https://github.com/dillonkearns/elm-graphql) library (especially
-[this talk](https://www.youtube.com/watch?v=memIRXFSNkU) of his).
+* Thanks to [ChristophP](https://github.com/ChristophP), author of [elm-i18next](https://github.com/ChristophP/elm-i18next),
+for his library, and for taking the time to chat about the idea of code generation for it, and providing feedback.
+* Thanks to [Dillon Kearns](https://github.com/dillonkearns) for the original inspiration for increased type safety using
+code generation, from his [elm-graphql](https://github.com/dillonkearns/elm-graphql) library, especially
+[this talk](https://www.youtube.com/watch?v=memIRXFSNkU) of his.
