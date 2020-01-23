@@ -138,10 +138,11 @@ causes parcel to rebundle the app.
 
 
 ## TODO
-* If running in watch mode, implicitly set overwrite to true?
 * Change logic for testing overwrite argument: should check for Translations.elm, and for Translations folder.
-* Create constants somewhere for duplicate Elm code, e.g. file template
-* Document code-generation handling of (sub)modules.
+* If running in watch mode, implicitly set overwrite to true?
+* Add more info in readme:
+  * Describe submodules
+  * Describe overwriting
 * Update error handling in `watch` mode: if error is caused by JSON (rather than bad args), do allow watching to commence.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?)
@@ -172,3 +173,11 @@ To get round this go to **Settings --> Languages & Frameworks --> Node.js and NP
 Then, when prompted, select the `elm-i18next-code-gen` module:
 
 ![Node coding assistance module selection](docs/images/node-coding-assistance-select-module.png)
+
+
+## Thanks
+* Thanks to [ChristophP](https://github.com/ChristophP), author of [elm-i18next](https://github.com/ChristophP/elm-i18next)
+for his library, and for taking the time to chat about the idea of code generation for it.
+* Thanks to [Dillon Kearns](https://github.com/dillonkearns) for the original inspiration from his
+[elm-graphql](https://github.com/dillonkearns/elm-graphql) library (especially
+[this talk](https://www.youtube.com/watch?v=memIRXFSNkU) of his.
