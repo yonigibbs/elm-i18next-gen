@@ -58,15 +58,31 @@ describe("code-gen", () => {
             `The supplied target folder is not a directory: ${fileThatShouldBeFolder}`)
     })
 
-    it("rejects target folder if it's empty and not overwriting", () => {
-        fs.mkdirpSync(path.join(targetFolder, "some-folder"))
+    it("aborts if Translations.elm exists and not overwriting", () => {
+        //fs.mkdirpSync(path.join(targetFolder, "some-folder"))
+        fs.writeFileSync(path.join(targetFolder, "Translations.elm"), "Test")
         assert.throws(
             () => executeCodeGeneration(sourceFile, targetFolder),
             UserError,
-            `Specified target folder is not empty: ${targetFolder}`)
+            `Translations already exist in specified target: ${targetFolder}. Try again with the 'overwrite' flag?`)
     })
 
-    it("overwrites target folder if overwriting", () => {
+    it("aborts folder if non-empty Translations folder exists and not overwriting", () => {
+        const translationsFolder = path.join(targetFolder, "Translations")
+        fs.mkdirpSync(translationsFolder)
+        fs.writeFileSync(path.join(translationsFolder, "SomeFile.elm"), "Test")
+        assert.throws(
+            () => executeCodeGeneration(sourceFile, targetFolder),
+            UserError,
+            `Translations already exist in specified target: ${targetFolder}. Try again with the 'overwrite' flag?`)
+    })
+
+    it("generates sample file", () => {
+        executeCodeGeneration(sourceFile, targetFolder)
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
+    })
+
+    it("overwrites Translations file and folder if overwriting", () => {
 
         const createNestedFolderStructure = parent => {
             const childFolder = path.join(parent, "child")

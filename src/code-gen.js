@@ -42,9 +42,24 @@ const deleteRemovedItems = (parentFolder, generatedFiles, pathRelativeToRoot) =>
 const readSourceFile = filename => {
     try {
         return JSON.parse(fs.readFileSync(filename, "utf8"))
-    } catch (err){
+    } catch (err) {
         throw new JsonError(`file could not be parsed: ${err.message}`)
     }
+}
+
+/**
+ * Decides whether the code generation process can proceed with the passed in target folder, in terms of overwriting it.
+ * The process will generate a file called `Translations.elm` in this folder, and possibly create a `Translations` subfolder
+ * with some files in it. This function will return `true` if there is no `Translations.elm` and the `Translations` folder
+ * doesn't exist or is empty.
+ */
+const canOverwrite = targetFolder => {
+    const translationsFile = path.join(targetFolder, "Translations.elm")
+    const translationsFolder = path.join(targetFolder, "Translations")
+    return !fs.existsSync(translationsFile) &&
+        (!fs.existsSync(translationsFolder) || (
+            fs.lstatSync(translationsFolder).isDirectory() && fs.readdirSync(translationsFolder).length === 0
+        ))
 }
 
 /**
@@ -64,9 +79,9 @@ module.exports = (sourceFile, targetFolder, overwrite = false) => {
         fs.mkdirpSync(resolvedTargetFolder)
     else if (!fs.lstatSync(resolvedTargetFolder).isDirectory())
         throw new UserError(`The supplied target folder is not a directory: ${resolvedTargetFolder}`)
-    else if (fs.readdirSync(resolvedTargetFolder).length > 0 && !overwrite)
+    else if (!overwrite && !canOverwrite(resolvedTargetFolder))
         // Target folder exists and has contents and overwrite flag isn't set.
-        throw new UserError(`Specified target folder is not empty: ${resolvedTargetFolder}`)
+        throw new UserError(`Translations already exist in specified target: ${resolvedTargetFolder}. Try again with the 'overwrite' flag?`)
 
     const source = readSourceFile(resolvedSourceFile)
     const files = generateCode(build(source))

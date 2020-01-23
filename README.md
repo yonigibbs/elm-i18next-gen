@@ -138,11 +138,9 @@ causes parcel to rebundle the app.
 
 
 ## TODO
-* Change logic for testing overwrite argument: should check for Translations.elm, and for Translations folder.
 * Add more info in readme:
   * Describe submodules
   * Describe overwriting
-* Update error handling in `watch` mode: if error is caused by JSON (rather than bad args), do allow watching to commence.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?)
 * Add comment at top of generated files to explain they are generated.
