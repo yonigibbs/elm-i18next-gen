@@ -41,7 +41,7 @@ const commandLineOptions = [
         name: "overwrite",
         alias: "o",
         type: Boolean,
-        description: "Ensures that if the target folder exists, it will be overwritten"
+        description: "Ensures that if the target folder exists, it will be overwritten. If this argument isn't supplied and the target folder exists and isn't empty, the process will abort."
     },
     {
         name: "watch",

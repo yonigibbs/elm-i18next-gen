@@ -2,10 +2,13 @@
 
 [![Actions Status](https://github.com/yonigibbs/elm-i18next-code-gen/workflows/Node%20CI/badge.svg)](https://github.com/yonigibbs/elm-i18next-code-gen/actions)
 
+
 ## Overview
 This tool generates code which can be added to an Elm project to allow it handle internationalization in a typesafe
 manner. The code it generates uses the [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
-package to read text values from a source JSON object.
+package to read text values from a source JSON object. If a change is made to the source JSON object this tool will ensure
+the corresponding change that is required in the code is found at compile-time, not at runtime.
+
 
 ## Motivation
 In Elm there are various approaches to solve the problem of internationalization, including
@@ -60,26 +63,95 @@ An important point here is that the generated code does not contain the actual t
 These values are still read from the source JSON object at runtime. This means that as new languages are added, or as
 string values are updated, the code doesn't have to change (unless of course the translation IDs or placeholders change). 
 
+
+## Installation
+This package is not currently published to the npm registry, but hopefully will be soon. In the meantime to install it
+run the following command, which will install it directly from this GitHub repo:
+
+    npm install --save-dev https://github.com/yonigibbs/elm-i18next-code-gen.git
+ 
+
 ## Usage
-TODO
+The tool can be directly using `npx` or by adding a new entry to the `scripts` section of `package.json` then using
+`npm run`.
+
+To run with `npx` execute this at the root of your project:
+
+    npx elm-i18next-code-gen ... [see below for args]
+
+To use `npm run` add this to `package.json`:
+
+    {
+      ...
+      "scripts": {
+        "code-gen-translations": "elm-i18next-code-gen ... [see below for args]"
+        ...
+
+Then execute this at the root of your project:
+
+    npm run code-gen-translations
+
+(The name of the script, in this example `code-gen-translations`, can be whatever you want.)
+
+
+### Command-line Arguments
+In order to run, this tool requires two command-line arguments to be supplied:
+* `--source` (short form `-s`): The source file containing the JSON which has the text resource values.
+* `--target` (short form `-t`): The target path (the folder in which the source files are to be generated).
+Without these the tool cannot run.
+
+Optionally, the following arguments can also be supplied:
+* `--overwrite` (short form `-o`): Ensures that if the target folder exists, it will be overwritten. If this argument
+isn't supplied and the target folder exists and isn't empty, the process will abort.
+* `--watch` (short form `-w`): Watches the source file for changes and regenerates the code whenever it does.
+
+Below is an example, using `npx`, of running this tool with the arguments specified:
+
+    npx elm-i18next-code-gen --source translations/master.json --target src/elm --overwrite
+
+The tool can also be integrated into your regular build script. For example say you happen to be using
+[parcel](https://parceljs.org/) to bundle your build, and your `package.json` contains this:
+
+    "scripts": {
+      "build": "parcel build ...",
+      "code-gen-translations": "elm-i18next-code-gen -s translations/master.json -t src/elm -o"
+
+The `build` script can be updated to call `code-gen-translations` as follows: 
+
+    "build": "npm run code-gen-translations && parcel build ..."
+
+#### Watch Mode
+Activating `watch` mode by passing in `--watch` (or `-w`) keeps the tool running and watching the source file for changes.
+Whenever a change occurs, the code will be regenerated. It only makes sense to call this mode if you also specify
+`--overwrite` (or `-o`) otherwise it will fail every time after the first code generation.
+
+This mode is useful when doing a lot of work on translations and wanting changes in the translation file to be made
+immediately available in the code. It can also give immediate feedback on what changes need to be made in the code if
+the translation file changes break the existing code. This is shown in the video below. Here 
+[parcel](https://parceljs.org/) is serving the app, ensuring the code is compiled as soon as any changes are made to it.
+Therefore when the translation file is update the code generation tool automatically updates the generated code, which
+causes parcel to rebundle the code. 
+
+![Code generation demo video](docs/images/elm-18n-code-gen.gif)
+
 
 ## TODO
-* Tests for "watch"?
+* Document code-generation handling of (sub)modules.
+* Update error handling in `watch` mode: if error is caused by JSON (rather than bad args), do allow watching to commence.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?)
 * Add comment at top of generated files to explain they are generated.
 * Handle duplicates (functions and modules).
 * Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage (or swap to commander?)
-* Validation of supplied target folder:
-  * Valid path, not a file, etc.
-  * Take in arg for what to do if target folder already exists (and isn't empty)?
+* Validation of supplied target folder (valid path, not a file, etc.)
+* Tests for "watch"?
 * Allow parameter delimiter to be configured (currently hard-coded to `Curly`).
 * Handle translations with fallbacks.
 * Allow to work with older versions of Node (which didn't have recursive folder creation).
 * TODOs in the code.
 * Allow user more control over generated files (e.g. hard-coded default of "Translations" as top-level module).
 * Publish as NPM package?
-* Consider moving to TypeScript?
+
 
 ## Maintaining
 ### Note for IntelliJ users
