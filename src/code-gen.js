@@ -16,7 +16,7 @@ const JsonError = require("./json-error")
  */
 const deleteRemovedItems = (parentFolder, generatedFiles, pathRelativeToRoot) => {
     // First check if there are any generated items in this folder: if not, we can simply delete it.
-    if (Object.keys(generatedFiles).some(fileName => fileName.startsWith(pathRelativeToRoot + path.sep))){
+    if (Object.keys(generatedFiles).some(fileName => fileName.startsWith(pathRelativeToRoot + path.sep))) {
         fs.readdirSync(parentFolder).forEach(child => {
             const fullChildPath = path.join(parentFolder, child)
             if (fs.lstatSync(fullChildPath).isDirectory()) {

@@ -121,6 +121,19 @@ describe("model-builder", () => {
                 ]
             })
         })
+
+        it("handles duplicate parameter", () => {
+            expect(build({test: "test {{param1}} {{param2}} {{param1}} this"})).to.deep.equal({
+                Translations: [{
+                    elmName: "test",
+                    jsonName: "test",
+                    parameters: [
+                        {elmName: "param1", jsonName: "param1"},
+                        {elmName: "param2", jsonName: "param2"},
+                    ]
+                }]
+            })
+        })
     })
 
     describe("sanitisation", () => {

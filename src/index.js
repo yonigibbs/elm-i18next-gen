@@ -97,7 +97,7 @@ try {
         // watch till we rerun with new args).
         try {
             writeResult(generate())
-        } catch (err){
+        } catch (err) {
             if (err instanceof JsonError)
                 writeResult(err.message, false)
             else

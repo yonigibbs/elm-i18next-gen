@@ -5,7 +5,7 @@ const JsonError = require("./json-error")
 /** Returns a copy of the passed in string with the first letter capitalised/decapitalised, based on the `caps` param. */
 const caseFirstLetter = (s, caps) => {
     const firstChar = s.charAt(0)
-    const casedFirstChar = caps?firstChar.toUpperCase():firstChar.toLowerCase()
+    const casedFirstChar = caps ? firstChar.toUpperCase() : firstChar.toLowerCase()
     return casedFirstChar + s.slice(1)
 }
 
@@ -63,11 +63,16 @@ const parseParams = translationText => {
             paramRegex.lastIndex++
 
         if (match.length === 2) {
-            if (match[1].trim().length> 0)
-                params.push({elmName: sanitiseParameterName(match[1]), jsonName: match[1]})
+            if (match[1].trim().length > 0) {
+                const elmName = sanitiseParameterName(match[1])
+                // Add this parameter only if it doesn't exist already. (We're assuming here that one `elmName` will always
+                // have the same `jsonName`, which might not be true, but really that's a problem with the source JSON.
+                if (!params.some(p => p.elmName === elmName))
+                    params.push({elmName, jsonName: match[1]})
+            }
         }
     }
-    // TODO: what about same placeholder used multiple times in same string?
+
     return params
 }
 

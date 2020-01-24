@@ -187,7 +187,6 @@ change this: maybe just put the files in the trash can / waste bin / recycle bin
 
 
 ## TODO
-* Handle duplicates (functions and modules).
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?) Make this configurable via an arg?
 * Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage (or swap to commander?)
