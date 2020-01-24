@@ -88,7 +88,7 @@ describe("code-gen", () => {
 
         // Ensure the generated structure is as expected
         const expectedFileContent = {...sampleFileContent}
-        delete expectedFileContent["Translations/Greetings.elm"]
+        delete expectedFileContent[path.join("Translations", "Greetings.elm")]
         expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedFileContent)
     })
 
@@ -137,8 +137,11 @@ describe("code-gen", () => {
         // Create a folder (with children) under "Translations/Greetings" which SHOULD be deleted as it's not in the new set of files.
         createNestedFolderStructure(greetingsFolder)
 
-        executeCodeGeneration( path.join(__dirname, "resources/nested-modules.json"), targetFolder, true)
-        expect(getAllFilesContent(targetFolder)).to.deep.equal({...nestedModulesFileContent, ["SomethingElse.elm"]: "Test"})
+        executeCodeGeneration(path.join(__dirname, "resources/nested-modules.json"), targetFolder, true)
+        expect(getAllFilesContent(targetFolder)).to.deep.equal({
+            ...nestedModulesFileContent,
+            ["SomethingElse.elm"]: "Test"
+        })
 
         // Also make sure the folders are exactly as we'd expect (i.e. all folders we expected to delete have been deleted).
         const ensureFolder = (folder, expectedSubfolders) =>
@@ -170,7 +173,7 @@ helloWithParams translations firstname middlename lastname =
 `,
 
     // Nested module
-    "Translations/Greetings.elm": `${buildFileStart("Translations.Greetings")}
+    [`${path.join("Translations", "Greetings.elm")}`]: `${buildFileStart("Translations.Greetings")}
 
 goodDay : Translations -> String
 goodDay translations =
@@ -187,7 +190,7 @@ greetName translations name =
  * An object containing the files with the Elm code expected to be generated for the empty-modules JSON file.
  */
 const emptyModulesFileContent = {
-    "Translations/ModuleWithSubmodulesOnly/Greetings.elm": `${buildFileStart("Translations.ModuleWithSubmodulesOnly.Greetings")}
+    [`${path.join("Translations", "ModuleWithSubmodulesOnly", "Greetings.elm")}`]: `${buildFileStart("Translations.ModuleWithSubmodulesOnly.Greetings")}
 
 goodDay : Translations -> String
 goodDay translations =
@@ -208,7 +211,7 @@ hello translations =
 `,
 
     // First level nested child
-    "Translations/Greetings.elm": `${buildFileStart("Translations.Greetings")}
+    [`${path.join("Translations", "Greetings.elm")}`]: `${buildFileStart("Translations.Greetings")}
 
 goodDay : Translations -> String
 goodDay translations =
@@ -216,7 +219,7 @@ goodDay translations =
 `,
 
     // Second level nested child
-    "Translations/Greetings/FurtherGreetings.elm": `${buildFileStart("Translations.Greetings.FurtherGreetings")}
+    [`${path.join("Translations", "Greetings", "FurtherGreetings.elm")}`]: `${buildFileStart("Translations.Greetings.FurtherGreetings")}
 
 anotherGreeting : Translations -> String
 anotherGreeting translations =
