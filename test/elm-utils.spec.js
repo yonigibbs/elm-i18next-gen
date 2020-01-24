@@ -1,6 +1,7 @@
 "use strict"
 
 const {expect} = require("chai")
+const path = require("path")
 const {moduleNameFromPath} = require("../src/elm-utils")
 
 describe("elm-utils", () => {
@@ -12,7 +13,7 @@ describe("elm-utils", () => {
             expect(moduleNameFromPath("Parent/MyModule.elm")).to.equal("Parent.MyModule"))
 
         it("handles file with two directories", () =>
-            expect(moduleNameFromPath("Parent1/Parent2/MyModule.elm")).to.equal("Parent1.Parent2.MyModule"))
+            expect(moduleNameFromPath(path.join("Parent1", "Parent2", "MyModule.elm"))).to.equal("Parent1.Parent2.MyModule"))
 
         // TODO: more tests, e.g. what about invalid files, files with no extensions, leading/trailing slashes, etc.
 
