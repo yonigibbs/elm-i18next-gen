@@ -99,7 +99,7 @@ npx elm-i18next-code-gen ... [see below for args]
 
 To use `npm run` add this to `package.json`:
 
-```json
+```
 {
   ...
   "scripts": {
@@ -169,7 +169,7 @@ This tool will generate a file called `Translations.elm` in the specified `targe
 for every string value in the source JSON. In the source JSON, however, not every key represents a string: some keys
 are used as parents to group together other string values:
 
-```json
+```
 {
   "hello": "Hello",             <-- This is a string value
   "greetings": {                <-- This is a grouping of string values
