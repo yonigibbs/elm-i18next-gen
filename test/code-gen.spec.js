@@ -36,7 +36,7 @@ describe("code-gen", () => {
 
     it("rejects source file if it's a folder", () => {
         const sourceFile = path.join(targetFolder, "the-folder")
-        fs.mkdirSync(sourceFile)
+        fs.mkdirpSync(sourceFile)
         assert.throws(
             () => executeCodeGeneration(sourceFile, targetFolder),
             UserError,
@@ -59,7 +59,6 @@ describe("code-gen", () => {
     })
 
     it("aborts if Translations.elm exists and not overwriting", () => {
-        //fs.mkdirpSync(path.join(targetFolder, "some-folder"))
         fs.writeFileSync(path.join(targetFolder, "Translations.elm"), "Test")
         assert.throws(
             () => executeCodeGeneration(sourceFile, targetFolder),
