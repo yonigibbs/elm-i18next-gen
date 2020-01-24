@@ -187,7 +187,6 @@ change this: maybe just put the files in the trash can / waste bin / recycle bin
 
 
 ## TODO
-* Update GitHub actions to test on Windows as well as Linux.
 * Handle duplicates (functions and modules).
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?) Make this configurable via an arg?
