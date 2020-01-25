@@ -4,10 +4,14 @@
 
 
 ## Overview
-This tool generates code which can be added to an Elm project to allow it handle internationalization in a typesafe
-manner. The code it generates uses the [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
-package to read text values from a source JSON object. If a change is made to the source JSON object this tool will ensure
-the corresponding change that is required in the code is found at compile-time, not at runtime.
+`elm-i18next-code-gen` is a tool for handling internationalization in Elm projects. It combines type safety with dynamic
+translation loading, allowing for a smoother translation process and smaller bundles than existing solutions, while
+maintaining type safety.
+
+The tool generates code which uses the [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
+package to read text values from a source JSON object. If a change is made to the source JSON object this tool ensures
+the corresponding change required in the code is found at compile-time, not at runtime. This means you don't need to
+worry about translations being out-of-sync with the code.
 
 
 ## Motivation
@@ -210,6 +214,11 @@ change this: maybe just put the files in the trash can / waste bin / recycle bin
 
 
 ## TODO
+* Remove use of underscores in sanitisation: remove all non-alphanumeric characters and treat them as word separators.
+* Add arg for how to handle functions, parameters and modules that start with a number. Currently it errors, but should
+be possible to configure the tool to add some prefix before the number.
+* Handle duplicates (functions, parameters and modules): not possible directly in JSON but because of sanitisation this
+could actually occur.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?) Make this configurable via an arg?
 * Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage (or swap to commander?)
@@ -241,7 +250,7 @@ Then, when prompted, select the `elm-i18next-code-gen` module:
 
 ## Thanks
 * Thanks to [ChristophP](https://github.com/ChristophP), author of [elm-i18next](https://github.com/ChristophP/elm-i18next),
-for his library, and for taking the time to chat about the idea of code generation for it, and providing feedback.
+for his library, and for taking the time to chat about the idea of code generation for it, and providing great feedback.
 * Thanks to [Dillon Kearns](https://github.com/dillonkearns) for the original inspiration for increased type safety using
 code generation, from his [elm-graphql](https://github.com/dillonkearns/elm-graphql) library, especially
 [this talk](https://www.youtube.com/watch?v=memIRXFSNkU) of his.
