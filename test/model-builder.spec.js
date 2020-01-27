@@ -225,6 +225,18 @@ describe("model-builder", () => {
                         "sub nested module": {
                             test: "test"
                         }
+                    },
+                    "dashed-nested-module": {
+                        test: "",
+                        "dashed-sub-nested-module": {
+                            test: "test"
+                        }
+                    },
+                    "underscore_nested_module": {
+                        test: "",
+                        "underscore_sub_nested_module": {
+                            test: "test"
+                        }
                     }
                 })).to.deep.equal({
                     Translations: [{elmName: "test", jsonName: "test", parameters: []}],
@@ -232,6 +244,26 @@ describe("model-builder", () => {
                     "Translations.NestedModule.SubNestedModule": [{
                         elmName: "test",
                         jsonName: "nested module.sub nested module.test",
+                        parameters: []
+                    }],
+                    "Translations.DashedNestedModule": [{
+                        elmName: "test",
+                        jsonName: "dashed-nested-module.test",
+                        parameters: []
+                    }],
+                    "Translations.DashedNestedModule.DashedSubNestedModule": [{
+                        elmName: "test",
+                        jsonName: "dashed-nested-module.dashed-sub-nested-module.test",
+                        parameters: []
+                    }],
+                    "Translations.UnderscoreNestedModule": [{
+                        elmName: "test",
+                        jsonName: "underscore_nested_module.test",
+                        parameters: []
+                    }],
+                    "Translations.UnderscoreNestedModule.UnderscoreSubNestedModule": [{
+                        elmName: "test",
+                        jsonName: "underscore_nested_module.underscore_sub_nested_module.test",
                         parameters: []
                     }]
                 })
@@ -241,21 +273,21 @@ describe("model-builder", () => {
                 expect(build({
                     "test some value": "",
                     nested: {
-                        "test some other value": "",
+                        "test-some other_value": "",
                         subNested: {
-                            "test yet another value": "test"
+                            "test-yet another_value": "test"
                         }
                     }
                 })).to.deep.equal({
                     Translations: [{elmName: "testSomeValue", jsonName: "test some value", parameters: []}],
                     "Translations.Nested": [{
                         elmName: "testSomeOtherValue",
-                        jsonName: "nested.test some other value",
+                        jsonName: "nested.test-some other_value",
                         parameters: []
                     }],
                     "Translations.Nested.SubNested": [{
                         elmName: "testYetAnotherValue",
-                        jsonName: "nested.subNested.test yet another value",
+                        jsonName: "nested.subNested.test-yet another_value",
                         parameters: []
                     }]
                 })
@@ -263,24 +295,24 @@ describe("model-builder", () => {
 
             it("joins words and camel cases parameter names", () => {
                 expect(build({
-                    testSomeValue: "some {{P1 abc def}} {{P2 abc def}} value",
+                    testSomeValue: "some {{P1-abc_def ghi}} {{P2-abc_def ghi}} value",
                     nested: {
-                        testSomeOtherValue: "some {{P3 abc def}} {{P4 abc def}} value",
+                        testSomeOtherValue: "some {{P3-abc_def ghi}} {{P4-abc_def ghi}} value",
                         subNested: {
-                            testYetAnotherValue: "some {{P5 abc def}} {{P6 abc def}} value"
+                            testYetAnotherValue: "some {{P5-abc_def ghi}} {{P6-abc_def ghi}} value"
                         }
                     }
                 })).to.deep.equal({
                     Translations: [{
                         elmName: "testSomeValue", jsonName: "testSomeValue", parameters: [
-                            {elmName: "p1AbcDef", jsonName: "P1 abc def"},
-                            {elmName: "p2AbcDef", jsonName: "P2 abc def"}
+                            {elmName: "p1AbcDefGhi", jsonName: "P1-abc_def ghi"},
+                            {elmName: "p2AbcDefGhi", jsonName: "P2-abc_def ghi"}
                         ]
                     }],
                     "Translations.Nested": [{
                         elmName: "testSomeOtherValue", jsonName: "nested.testSomeOtherValue", parameters: [
-                            {elmName: "p3AbcDef", jsonName: "P3 abc def"},
-                            {elmName: "p4AbcDef", jsonName: "P4 abc def"}
+                            {elmName: "p3AbcDefGhi", jsonName: "P3-abc_def ghi"},
+                            {elmName: "p4AbcDefGhi", jsonName: "P4-abc_def ghi"}
                         ]
                     }],
                     "Translations.Nested.SubNested": [
@@ -288,8 +320,8 @@ describe("model-builder", () => {
                             elmName: "testYetAnotherValue",
                             jsonName: "nested.subNested.testYetAnotherValue",
                             parameters: [
-                                {elmName: "p5AbcDef", jsonName: "P5 abc def"},
-                                {elmName: "p6AbcDef", jsonName: "P6 abc def"}
+                                {elmName: "p5AbcDefGhi", jsonName: "P5-abc_def ghi"},
+                                {elmName: "p6AbcDefGhi", jsonName: "P6-abc_def ghi"}
                             ]
                         }]
                 })
@@ -396,23 +428,40 @@ describe("model-builder", () => {
         })
 
         describe("illegal character replacement", () => {
-            it("replaces illegal chacters in module name", () => {
-                expect(build({"A$.%:B": {test: ""}})).to.deep.equal({
-                    "Translations.A_B": [{elmName: "test", jsonName: "A$.%:B.test", parameters: []}]
+            it("removes illegal characters in module name", () => {
+                expect(build({"!Abc$.-_%:Def&": {test: ""}})).to.deep.equal({
+                    "Translations.AbcDef": [{elmName: "test", jsonName: "!Abc$.-_%:Def&.test", parameters: []}]
                 })
             })
 
-            it("replaces illegal chacters in function name", () => {
-                expect(build({"A$.%:B": ""})).to.deep.equal({
-                    "Translations": [{elmName: "a_B", jsonName: "A$.%:B", parameters: []}]
+            it("removes illegal characters in function name", () => {
+                expect(build({"!Abc$.-_%:def&": ""})).to.deep.equal({
+                    "Translations": [{elmName: "abcDef", jsonName: "!Abc$.-_%:def&", parameters: []}]
                 })
             })
 
-            it("replaces illegal chacters in parameter name", () => {
-                expect(build({test: "test {{A$.%:B}} value"})).to.deep.equal({
+            it("removes illegal characters in parameter name", () => {
+                expect(build({test: "test {{!Abc$.-_%:def&}} value"})).to.deep.equal({
                     "Translations": [{
-                        elmName: "test", jsonName: "test", parameters: [{elmName: "a_B", jsonName: "A$.%:B"}]
+                        elmName: "test", jsonName: "test", parameters: [{elmName: "abcDef", jsonName: "!Abc$.-_%:def&"}]
                     }]
+                })
+            })
+
+            it("prefixes numbers in module/function/parameter", () => {
+                expect(build({"12": {"34": "some {{56}} {{78}} value"}})).to.deep.equal({
+                    "Translations.T12": [{
+                        elmName: "t34", jsonName: "12.34", parameters: [
+                            {elmName: "t56", jsonName: "56"},
+                            {elmName: "t78", jsonName: "78"}
+                        ]
+                    }]
+                })
+            })
+
+            it("ignores blank parameters", () => {
+                expect(build({test: "some {{}} value {{  }}"})).to.deep.equal({
+                    "Translations": [{elmName: "test", jsonName: "test", parameters: []}]
                 })
             })
         })
@@ -422,7 +471,16 @@ describe("model-builder", () => {
                 assert.throws(
                     () => build({"  ": {test: ""}}),
                     JsonError,
-                    "The supplied JSON file has a problem in it: an entry with no ID was found."
+                    "The supplied JSON file has a problem in it: a module with no ID was found."
+                )
+            })
+
+            it("throws error if module has no valid characters", () => {
+                // noinspection NonAsciiCharacters
+                assert.throws(
+                    () => build({" !^&£$ ": {test: ""}}),
+                    JsonError,
+                    "The supplied JSON file has a problem in it: ' !^&£$ ' is not a valid module name."
                 )
             })
 
@@ -430,31 +488,25 @@ describe("model-builder", () => {
                 assert.throws(
                     () => build({test: {"  ": ""}}),
                     JsonError,
-                    "The supplied JSON file has a problem in it: an entry with no ID was found."
+                    "The supplied JSON file has a problem in it: a function with no ID was found."
                 )
             })
 
-            it("throws error if module name starts with number", () => {
+            it("throws error if function has no valid characters", () => {
+                // noinspection NonAsciiCharacters
                 assert.throws(
-                    () => build({"1xx": {test: ""}}),
+                    () => build({" !^&£$ ": ""}),
                     JsonError,
-                    "The supplied JSON file has a problem in it: '1xx' is not a valid name for an Elm module/function/parameter. The first character must be a letter."
+                    "The supplied JSON file has a problem in it: ' !^&£$ ' is not a valid function name."
                 )
             })
 
-            it("throws error if module name starts with non-alphanumeric character", () => {
+            it("throws error if parameter has no valid characters", () => {
+                // noinspection NonAsciiCharacters
                 assert.throws(
-                    () => build({"%xx": {test: ""}}),
+                    () => build({test: "some {{!^&£$}} value"}),
                     JsonError,
-                    "The supplied JSON file has a problem in it: '%xx' is not a valid name for an Elm module/function/parameter. The first character must be a letter."
-                )
-            })
-
-            it("ensures module name starts with alphabetic character (trimmed)", () => {
-                assert.throws(
-                    () => build({"  1xx   ": {test: ""}}),
-                    JsonError,
-                    "The supplied JSON file has a problem in it: '1xx' is not a valid name for an Elm module/function/parameter. The first character must be a letter."
+                    "The supplied JSON file has a problem in it: '!^&£$' is not a valid parameter name."
                 )
             })
         })

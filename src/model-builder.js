@@ -9,49 +9,49 @@ const caseFirstLetter = (s, caps) => {
     return casedFirstChar + s.slice(1)
 }
 
-/** The regular expression used to find illegal Elm characters (i.e. characters that aren't letters, numbers or underscores. */
-const illegalCharRegex = /[^\w]+/gi
-
-/** Returns a copy of the passed in string, with illegal chars (or a contiguous set of them) replaced by an underscore. */
-const removeIllegalChars = s => s.replace(illegalCharRegex, "_")
-
 /**
- * Returns a sanitised version of the passed in string. Trims it, removes white space, replaces illegal characters with
- * underscore, and capitalises the first letter of each words (potentially treating the first word differently based on
- * the `casing` argument).
+ * Returns a sanitised version of the passed in string. Trims it, removes white space and illegal characters, and
+ * capitalises the first letter of each words (potentially treating the first word differently based on  the `type`
+ * argument).
  *
- * If first character is not a letter an exception is thrown (functions, modules, parameters) all need the first character
- * to be a letter.
+ * If first character is a number then it is prefixed with `t` or `T` (based on `type`).
  *
- * @param casing "pascal" or "camel".
+ * If all illegal characters have been removed and the value left is blank, an error is thrown.
+ *
+ * @param type "module", "function", or "parameter".
  */
-const sanitise = (unsanitised, casing) => {
+const sanitise = (unsanitised, type) => {
     const trimmed = unsanitised.trim()
-    const firstChar = trimmed.charAt(0)
-    if (!firstChar)
-        throw new JsonError("an entry with no ID was found.")
-    if (!firstChar.match(/[a-z]/i))
-        throw new JsonError(`'${trimmed}' is not a valid name for an Elm module/function/parameter. The first character must be a letter.`)
+    if (!trimmed)
+        throw new JsonError(`a ${type} with no ID was found.`)
 
-    return unsanitised
-        .split(/\s+/) // Split by white space
+    const sanitised = unsanitised
+        .split(/[^a-z0-9]+/gi) // Split by illegal characters (i.e. any one or more chars that aren't numbers or letters)
         .map(word => word.trim()) // Trim each value
         .filter(word => word) // Remove empty entries
         .map((word, index) => {
             // Capitalise first letter of each word - first word treated a bit differently if using camel casing
-            const caps = index > 0 || casing === "pascal"
+            const caps = index > 0 || type === "module"
             return caseFirstLetter(word, caps)
         })
-        .map(removeIllegalChars)
         .join("")
+
+    if (!sanitised)
+        throw new JsonError(`'${unsanitised}' is not a valid ${type} name.`)
+
+    if (sanitised.charAt(0).match(/[0-9]/)) {
+        const prefix = type === "module" ? "T" : "t"
+        return prefix + sanitised
+    }
+    return sanitised
 }
 
-const sanitiseModuleName = unsanitised => sanitise(unsanitised, "pascal")
-const sanitiseFunctionName = unsanitised => sanitise(unsanitised, "camel")
-const sanitiseParameterName = unsanitised => sanitise(unsanitised, "camel")
+const sanitiseModuleName = unsanitised => sanitise(unsanitised, "module")
+const sanitiseFunctionName = unsanitised => sanitise(unsanitised, "function")
+const sanitiseParameterName = unsanitised => sanitise(unsanitised, "parameter")
 
 /** The regular expression that finds parameters in a translated text. */
-const paramRegex = /{{(.+?)}}/g
+const paramRegex = /{{(.*?)}}/g
 
 /** Parses the parameters from the passed in text and returns an array containing the parameters. */
 const parseParams = translationText => {

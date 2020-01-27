@@ -8,7 +8,7 @@
     "url": "https://github.com/yonigibbs/elm-i18next-gen"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "mocha && npm run elm-format-validate",
     "test-watch": "mocha --watch",
     "lint": "eslint **/*.js",
     "lint-fix": "eslint --fix **/*.js",

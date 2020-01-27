@@ -169,6 +169,7 @@ parcel to rebundle the app.
 
 
 ### Generated Code
+#### Files & Module Structure
 `elm-i18next-gen` will generate a file called `Translations.elm` in the specified `target` folder. In it, it will create
 a function for every string value in the source JSON. In the source JSON, however, not every key represents a string:
 some keys are used as parents to group together other string values:
@@ -193,6 +194,23 @@ put there. This file will contain the `goodDay` and `greetName` functions.
 Modules can be nested as deeply as desired.
 
 
+#### Module/Function/Parameter Names
+`elm-i18next-gen` will generate valid and idiomatic Elm code for the values in the source JSON. Often the generated
+Elm items (e.g. function names) will directly match the source JSON keys, but in some cases there might be differences.
+This is because the rules and normal usage of JSON and Elm are a bit different. For example, in Elm a function must start
+with a lower case letter, have no spaces or dashes, and by convention `camelCase` in used. In JSON, however, `kebab-case`
+perfectly valid, and keys can be lower or upper case.
+
+Because of this, `elm-i18next-gen` "sanitises" the JSON keys before generating the Elm code. For example the JSON key
+`greet-user` will be converted into an Elm function called `greetUser`. This also applies to generated modules and
+parameters.
+
+This is all fairly intuitive. There is however one case where no completely intuitive solution is obvious: where a JSON
+key starts with a number. This is not valid in Elm as modules/functions/parameters must start with a letter. Therefore
+in such cases the module/function/parameter will be prefixed with `T` (for modules) or `t` (for functions and parameters).
+(`T` is used as shorthand for "Translation".)
+
+
 ### Overwriting
 As explained above, the `overwrite` argument defines whether or not the code generation process should overwrite any
 existing files. If the `overwrite` flag isn't specified the logic is quite simple: the operation will only proceed if
@@ -214,9 +232,6 @@ to change this: maybe just put the files in the trash can / waste bin / recycle 
 
 
 ## TODO
-* Remove use of underscores in sanitisation: remove all non-alphanumeric characters and treat them as word separators.
-* Add arg for how to handle functions, parameters and modules that start with a number. Currently it errors, but should
-be possible to configure the tool to add some prefix before the number.
 * Handle translations with fallbacks (`tf` and `trf`).
 * Handle duplicates (functions, parameters and modules): not possible directly in JSON but because of sanitisation this
 could actually occur.
