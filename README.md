@@ -133,7 +133,7 @@ Optionally, the following arguments can also be supplied:
 argument isn't supplied and any of the target files exist, the process will abort. See the [Overwriting](#overwriting)
 section below for further details.
 * `--watch` (short form `-w`): Watches the source file for changes and regenerates the code whenever it does.
-* `--fallback` (short form `-w`): Generates functions which receive a list of fallback languages. The generated functions
+* `--fallback` (short form `-f`): Generates functions which receive a list of fallback languages. The generated functions
 will use [tf](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest/I18Next#tf) and
 [trf](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest/I18Next#trf) instead of
 [t](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest/I18Next#t) and
