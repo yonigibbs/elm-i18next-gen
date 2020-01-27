@@ -217,9 +217,7 @@ to change this: maybe just put the files in the trash can / waste bin / recycle 
 * Remove use of underscores in sanitisation: remove all non-alphanumeric characters and treat them as word separators.
 * Add arg for how to handle functions, parameters and modules that start with a number. Currently it errors, but should
 be possible to configure the tool to add some prefix before the number.
-* Ensure generated code passes `elm-format --validate`
 * Handle translations with fallbacks (`tf` and `trf`).
-* Add step to CI build to ensure generated code passes `elm-format --validate`
 * Handle duplicates (functions, parameters and modules): not possible directly in JSON but because of sanitisation this
 could actually occur.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
