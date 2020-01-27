@@ -239,8 +239,6 @@ to change this: maybe just put the files in the trash can / waste bin / recycle 
 
 
 ## TODO
-* Add "integration test" that runs a new Node process with cmd-line args to make sure all works as expected.
-  * Test all cmd line args, including `watch` mode.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?) Make this configurable via an arg?
 * Validation of supplied target folder (valid path, not a file, etc.)

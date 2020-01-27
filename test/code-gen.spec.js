@@ -5,9 +5,9 @@ const os = require("os")
 const fs = require("fs-extra")
 const path = require("path")
 const executeCodeGeneration = require("../src/code-gen")
-const {getAllFilesContent} = require("./test-utils")
 const UserError = require("../src/user-error")
-const {buildFileStart} = require("../src/elm-utils")
+const {getAllFilesContent, expectedSampleFileContent, expectedNestedModulesFileContent, expectedEmptyModulesFileContent} =
+    require("./test-utils")
 
 const sourceFile = path.join(__dirname, "resources/sample.json")
 const targetFolder = path.join(os.tmpdir(), "i18n-unit-test/code-gen")
@@ -18,12 +18,12 @@ describe("code-gen", () => {
 
     it("generates sample file", () => {
         executeCodeGeneration(sourceFile, targetFolder)
-        expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedSampleFileContent)
     })
 
     it("ignores empty modules", () => {
         executeCodeGeneration(path.join(__dirname, "resources/empty-modules.json"), targetFolder)
-        expect(getAllFilesContent(targetFolder)).to.deep.equal(emptyModulesFileContent)
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedEmptyModulesFileContent)
     })
 
     it("rejects missing source file", () => {
@@ -46,7 +46,7 @@ describe("code-gen", () => {
     it("creates folder structure file", () => {
         const customTargetFolder = path.join(targetFolder, "some", "extra", "folder")
         executeCodeGeneration(sourceFile, customTargetFolder)
-        expect(getAllFilesContent(customTargetFolder)).to.deep.equal(sampleFileContent)
+        expect(getAllFilesContent(customTargetFolder)).to.deep.equal(expectedSampleFileContent)
     })
 
     it("rejects target folder if it's a file", () => {
@@ -87,7 +87,7 @@ describe("code-gen", () => {
         expect(fs.existsSync(path.join(targetFolder, "Translations"))).to.be.false
 
         // Ensure the generated structure is as expected
-        const expectedFileContent = {...sampleFileContent}
+        const expectedFileContent = {...expectedSampleFileContent}
         delete expectedFileContent[path.join("Translations", "Greetings.elm")]
         expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedFileContent)
     })
@@ -101,7 +101,7 @@ describe("code-gen", () => {
         executeCodeGeneration(sourceFile, targetFolder, true)
 
         // Make sure the results are as we expect.
-        expect(getAllFilesContent(targetFolder)).to.deep.equal(sampleFileContent)
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedSampleFileContent)
 
         // Ensure there's no Translations/ModuleWithSubmodulesOnly folder left.
         expect(fs.existsSync(path.join(targetFolder, "Translations", "ModuleWithSubmodulesOnly"))).to.be.false
@@ -139,7 +139,7 @@ describe("code-gen", () => {
 
         executeCodeGeneration(path.join(__dirname, "resources/nested-modules.json"), targetFolder, true)
         expect(getAllFilesContent(targetFolder)).to.deep.equal({
-            ...nestedModulesFileContent,
+            ...expectedNestedModulesFileContent,
             ["SomethingElse.elm"]: "Test"
         })
 
@@ -154,75 +154,3 @@ describe("code-gen", () => {
         ensureFolder(greetingsFolder, [])
     })
 })
-
-/**
- * An object containing the files with the Elm code expected to be generated for the sample JSON file.
- */
-const sampleFileContent = {
-    // Top level module
-    "Translations.elm": `${buildFileStart("Translations")}
-
-hello : Translations -> String
-hello translations =
-    t translations "hello"
-
-
-helloWithParams : Translations -> String -> String -> String -> String
-helloWithParams translations firstname middlename lastname =
-    tr translations Curly "helloWithParams" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]
-`,
-
-    // Nested module
-    [`${path.join("Translations", "Greetings.elm")}`]: `${buildFileStart("Translations.Greetings")}
-
-goodDay : Translations -> String
-goodDay translations =
-    t translations "greetings.goodDay"
-
-
-greetName : Translations -> String -> String
-greetName translations name =
-    tr translations Curly "greetings.greetName" [ ( "name", name ) ]
-`
-}
-
-/**
- * An object containing the files with the Elm code expected to be generated for the empty-modules JSON file.
- */
-const emptyModulesFileContent = {
-    [`${path.join("Translations", "ModuleWithSubmodulesOnly", "Greetings.elm")}`]: `${buildFileStart("Translations.ModuleWithSubmodulesOnly.Greetings")}
-
-goodDay : Translations -> String
-goodDay translations =
-    t translations "moduleWithSubmodulesOnly.greetings.goodDay"
-`
-}
-
-/**
- * An object containing the files with the Elm code expected to be generated for the nested-modules JSON file.
- */
-const nestedModulesFileContent = {
-    // Top level module
-    "Translations.elm": `${buildFileStart("Translations")}
-
-hello : Translations -> String
-hello translations =
-    t translations "hello"
-`,
-
-    // First level nested child
-    [`${path.join("Translations", "Greetings.elm")}`]: `${buildFileStart("Translations.Greetings")}
-
-goodDay : Translations -> String
-goodDay translations =
-    t translations "greetings.goodDay"
-`,
-
-    // Second level nested child
-    [`${path.join("Translations", "Greetings", "FurtherGreetings.elm")}`]: `${buildFileStart("Translations.Greetings.FurtherGreetings")}
-
-anotherGreeting : Translations -> String
-anotherGreeting translations =
-    t translations "greetings.furtherGreetings.anotherGreeting"
-`
-}
