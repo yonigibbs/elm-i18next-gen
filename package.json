@@ -12,7 +12,7 @@
     "test-watch": "mocha --watch",
     "lint": "eslint **/*.js",
     "lint-fix": "eslint --fix **/*.js",
-    "elm-format-validate": "mkdir -p elm-format-validate && ./bin/elm-i18next-gen -s test/resources/sample.json -t elm-format-validate -o && npx elm-format elm-format-validate/ --validate"
+    "elm-format-validate": "mkdir -p elm-format-validate && bin/elm-i18next-gen -s test/resources/sample.json -t elm-format-validate -o && npx elm-format elm-format-validate/ --validate"
   },
   "author": "",
   "license": "ISC",

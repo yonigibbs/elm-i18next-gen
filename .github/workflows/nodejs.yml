@@ -48,6 +48,7 @@ jobs:
           npm run lint
           npm test
           npm run elm-format-validate
+        shell: bash
         env:
           CI: true
 
