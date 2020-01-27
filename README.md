@@ -1,17 +1,17 @@
 # Code Generation for [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
 
-[![Actions Status](https://github.com/yonigibbs/elm-i18next-code-gen/workflows/Node%20CI/badge.svg)](https://github.com/yonigibbs/elm-i18next-code-gen/actions)
+[![Actions Status](https://github.com/yonigibbs/elm-i18next-gen/workflows/Node%20CI/badge.svg)](https://github.com/yonigibbs/elm-i18next-gen/actions)
 
 
 ## Overview
-`elm-i18next-code-gen` is a tool for handling internationalization in Elm projects. It combines type safety with dynamic
+`elm-i18next-gen` is a tool for handling internationalization in Elm projects. It combines type safety with dynamic
 translation loading, allowing for a smoother translation process and smaller bundles than existing solutions, while
 maintaining type safety.
 
-The tool generates code which uses the [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
-package to read text values from a source JSON object. If a change is made to the source JSON object this tool ensures
-the corresponding change required in the code is found at compile-time, not at runtime. This means you don't need to
-worry about translations being out-of-sync with the code.
+This tool generates code which uses the [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
+package to read text values from a source JSON object. If a change is made to the source JSON object `elm-i18next-gen`
+ensures the corresponding change required in the code is found at compile-time, not at runtime. This means you don't need
+to worry about translations being out-of-sync with the code.
 
 
 ## Motivation
@@ -50,9 +50,9 @@ tr model.translations Curly "gretName" [ ( "nam", "Peter" ) ]
 There are two typos there, neither of which would be caught at compile time, leading to problems (though not exceptions:
 this is Elm after all :relaxed:) when the page is rendered.
 
-To solve this problem, the tool in this repo takes in a JSON file containing the translations, and generates a function
-for each string value. That function itself simply calls the _i18next_ package. The code in the application then calls
-those generated functions rather than using the _i18next_ package directly.
+To solve this problem, `elm-i18next-gen` takes in a JSON file containing the translations, and generates a function for
+each string value. That function itself simply calls the _i18next_ package. The code in the application then calls those
+generated functions rather than using the _i18next_ package directly.
 
 Using the example above, the generated code for it would look as follows:
 
@@ -83,22 +83,22 @@ This package is not currently published to the npm registry, but hopefully will 
 run the following command, which will install it directly from this GitHub repo:
 
 ```sh
-npm install --save-dev https://github.com/yonigibbs/elm-i18next-code-gen.git
+npm install --save-dev https://github.com/yonigibbs/elm-i18next-gen.git
 ```
 
 ## Pre-requisites
-This tool only works on Node 12 or higher. It can be made to work on earlier versions if required: log an issue if you
-need this.
+`elm-i18next-gen` only works on Node 12 or higher. It can be made to work on earlier versions if required: log an issue
+if you need this.
 
 
 ## Usage
-The tool can be run directly using `npx` or by adding a new entry to the `scripts` section of `package.json` then using
-`npm run`.
+`elm-i18next-gen` can be run directly using `npx` or by adding a new entry to the `scripts` section of `package.json`
+then using `npm run`.
 
 To run with `npx` execute this at the root of your project:
 
 ```sh
-npx elm-i18next-code-gen ... [see below for args]
+npx elm-i18next-gen ... [see below for args]
 ```
 
 To use `npm run` add this to `package.json`:
@@ -107,26 +107,26 @@ To use `npm run` add this to `package.json`:
 {
   ...
   "scripts": {
-    "code-gen-translations": "elm-i18next-code-gen ... [see below for args]"
+    "generate-translations": "elm-i18next-gen ... [see below for args]"
     ...
 ```
 
 Then execute this at the root of your project:
 
 ```sh
-npm run code-gen-translations
+npm run generate-translations
 ```
 
-(The name of the script, in this example `code-gen-translations`, can be whatever you want.)
+(The name of the script, in this example `generate-translations`, can be whatever you want.)
 
 
 ### Command-line Arguments
-In order to run, this tool requires two command-line arguments to be supplied:
+In order to run, this `elm-i18next-gen` requires two command-line arguments to be supplied:
 * `--source` (short form `-s`): The source file containing the JSON which contains the translations.
 * `--target` (short form `-t`): The folder in which the source files are to be generated. Can be absolute or relative to
 current folder.
 
-Without these the tool cannot run.
+Without these this tool cannot run.
 
 Optionally, the following arguments can also be supplied:
 * `--overwrite` (short form `-o`): Ensures that if the any of the target files exist, they will be overwritten. If this
@@ -134,44 +134,44 @@ argument isn't supplied and any of the target files exist, the process will abor
 section below for further details.
 * `--watch` (short form `-w`): Watches the source file for changes and regenerates the code whenever it does.
 
-Below is an example of running this tool using `npx`, including the arguments:
+Below is an example of running `elm-i18next-gen` using `npx`, including the arguments:
 
-    npx elm-i18next-code-gen --source translations/master.json --target src --overwrite
+    npx elm-i18next-gen --source translations/master.json --target src --overwrite
 
-The tool can also be integrated into your regular build script. For example say you happen to be using
+`elm-i18next-gen` can also be integrated into your regular build script. For example say you happen to be using
 [parcel](https://parceljs.org/) to bundle your build, and your `package.json` contains this:
 
 ```json
 "scripts": {
   "build": "parcel build ...",
-  "code-gen-translations": "elm-i18next-code-gen -s translations/master.json -t src -o"
+  "generate-translations": "elm-i18next-gen -s translations/master.json -t src -o"
 ```
 
-The `build` script can be updated to call `code-gen-translations` as follows:
+The `build` script can be updated to call `generate-translations` as follows:
 
 ```json
-  "build": "npm run code-gen-translations && parcel build ..."
+"build": "npm run generate-translations && parcel build ..."
 ```
 
 #### Watch Mode
-Activating `watch` mode by passing in `--watch` (or `-w`) keeps the tool running and watching the source file for changes.
-Whenever a change occurs, the code will be regenerated. Adding this argument implicitly sets `overwrite` to true,
-otherwise it would fail every time after the first code generation.
+Activating `watch` mode by passing in `--watch` (or `-w`) keeps `elm-i18next-gen` running and watching the source file
+for changes. Whenever a change occurs, the code will be regenerated. Adding this argument implicitly sets `overwrite` to
+true, otherwise it would fail every time after the first code generation.
 
 This mode is useful when doing a lot of work on translations and wanting changes in the translation file to be made
 immediately available in the code. It can also give immediate feedback on what changes need to be made in the code if
 the translation file changes break the existing code. This is shown in the video below. Here
 [parcel](https://parceljs.org/) is serving the app, ensuring the code is compiled as soon as any changes are made to it.
-Therefore when the translation file is updated the code generation tool automatically updates the generated code, which
-causes parcel to rebundle the app.
+Therefore when the translation file is updated `elm-i18next-gen` automatically updates the generated code, which causes
+parcel to rebundle the app.
 
-![Code generation demo video](docs/images/elm-18n-code-gen.gif)
+![Code generation demo video](docs/images/code-generation-demo.gif)
 
 
 ### Generated Code
-This tool will generate a file called `Translations.elm` in the specified `target` folder. In it, it will create a function
-for every string value in the source JSON. In the source JSON, however, not every key represents a string: some keys
-are used as parents to group together other string values:
+`elm-i18next-gen` will generate a file called `Translations.elm` in the specified `target` folder. In it, it will create
+a function for every string value in the source JSON. In the source JSON, however, not every key represents a string:
+some keys are used as parents to group together other string values:
 
 ```
 {
@@ -183,8 +183,8 @@ are used as parents to group together other string values:
 }
 ```
 
-For every such "grouping", this tool will generate an Elm module. So for the example JSON above, the following structure
-will be generated in the `target` folder:
+For every such "grouping", an Elm module will be generated. So for the example JSON above, the following structure will
+be created in the `target` folder:
 
 * `Translations.elm`: contains the `hello` function.
 * `Translations/Greetings.elm`: a `Translations` folder will be created under the `target` folder, and this file will be
@@ -197,8 +197,8 @@ Modules can be nested as deeply as desired.
 As explained above, the `overwrite` argument defines whether or not the code generation process should overwrite any
 existing files. If the `overwrite` flag isn't specified the logic is quite simple: the operation will only proceed if
 `Translations.elm` does not exist and the `Translations` folder doesn't exist (or is empty). If `overwrite` is specified
-and there are no submodules, again the logic is simple: the tool will simply overwrite that file. However if `overwrite`
-is specified and there are submodules, a complexity can arise...
+and there are no submodules, again the logic is simple: `elm-i18next-gen` will simply overwrite that file. However if
+`overwrite` is specified and there are submodules, a complexity can arise...
 
 Taking the example JSON above, we saw that two files were generated: `Translations.elm` and `Translations/Greetings.elm`.
 Now imagine the `greetings` key in the source JSON was renamed to `welcomeMessages`. What should happen here? Obviously
@@ -207,16 +207,19 @@ a file called `Translations/WelcomeMessages.elm` should be created, but what sho
 no need for the `Translations` folder at all, as there are no submodules to generate. So what should happen with the
 previously created `Translations` folder?
 
-The way the tool handles this is by deleting any files and folders previously generated in the `Translations` folder,
-if the newly supplied JSON no longer requires them. It also deletes the `Translations` folder itself if it's no longer
-required. Clearly this is potentially dangerous: files are being deleted! There's a [TODO](#todo) item noted below to
-change this: maybe just put the files in the trash can / waste bin / recycle bin instead.
+The way `elm-i18next-gen` handles this is by deleting any files and folders previously generated in the `Translations`
+folder, if the newly supplied JSON no longer requires them. It also deletes the `Translations` folder itself if it's no
+longer required. Clearly this is potentially dangerous: files are being deleted! There's a [TODO](#todo) item noted below
+to change this: maybe just put the files in the trash can / waste bin / recycle bin instead.
 
 
 ## TODO
 * Remove use of underscores in sanitisation: remove all non-alphanumeric characters and treat them as word separators.
 * Add arg for how to handle functions, parameters and modules that start with a number. Currently it errors, but should
 be possible to configure the tool to add some prefix before the number.
+* Ensure generated code passes `elm-format --validate`
+* Handle translations with fallbacks (`tf` and `trf`).
+* Add step to CI build to ensure generated code passes `elm-format --validate`
 * Handle duplicates (functions, parameters and modules): not possible directly in JSON but because of sanitisation this
 could actually occur.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
@@ -225,11 +228,11 @@ could actually occur.
 * Validation of supplied target folder (valid path, not a file, etc.)
 * Tests for all cmd-line args/behaviour (e.g. watch).
 * Allow parameter delimiter to be configured (currently hard-coded to `Curly`).
-* Handle translations with fallbacks.
 * Allow to work with older versions of Node (which didn't have recursive folder creation).
 * TODOs in the code.
 * Allow user more control over generated files (e.g. hard-coded default of "Translations" as top-level module).
-* Publish as NPM package?
+* Publish as NPM package (update instructions in readme after this done).
+* Add quickstart section to readme after available in NPM.
 
 
 ## Maintaining
@@ -243,7 +246,7 @@ To get round this go to **Settings --> Languages & Frameworks --> Node.js and NP
 
 ![Coding assistance for Node.js](docs/images/node-coding-assistance.png)
 
-Then, when prompted, select the `elm-i18next-code-gen` module:
+Then, when prompted, select the `elm-i18next-gen` module:
 
 ![Node coding assistance module selection](docs/images/node-coding-assistance-select-module.png)
 

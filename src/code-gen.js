@@ -68,7 +68,7 @@ const canOverwrite = targetFolder => {
 }
 
 /**
- * The main entry point for the whole code-generation process. Reads the supplied sourceFile, builds up a model representing
+ * The main entry point for the whole code generation process. Reads the supplied sourceFile, builds up a model representing
  * the data in it, builds the code for this, and finally writes that code to the file system as the supplied targetFolder.
  */
 module.exports = (sourceFile, targetFolder, overwrite = false) => {

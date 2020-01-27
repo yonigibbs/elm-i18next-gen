@@ -5,6 +5,9 @@
 
 /node_modules/
 
+# File added when launching Dolphin from IntelliJ.
+.directory
+
 # End Custom
 
 # User-specific stuff

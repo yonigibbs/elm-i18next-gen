@@ -1,5 +1,5 @@
 {
-  "name": "elm-i18next-code-gen",
+  "name": "elm-i18next-gen",
   "version": "1.0.0",
   "description": "Code generation for elm-i18next",
   "main": "index.js",
@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "elm-i18next-code-gen": "bin/elm-i18next-code-gen"
+    "elm-i18next-gen": "bin/elm-i18next-gen"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",
