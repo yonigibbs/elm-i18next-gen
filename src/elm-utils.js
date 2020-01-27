@@ -30,7 +30,7 @@ const buildFileStart = (moduleName, useFallbackLanguages = false) =>
 
 module ${moduleName} exposing (..)
 
-import I18Next exposing (Delims(..), Translations, ${useFallbackLanguages ? "tf, trf": "t, tr"})
+import I18Next exposing (Delims(..), Translations, ${useFallbackLanguages ? "tf, trf" : "t, tr"})
 `
 
 module.exports = {

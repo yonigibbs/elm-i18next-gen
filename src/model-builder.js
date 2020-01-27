@@ -88,15 +88,21 @@ const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.
         if (typeof sourcePropValue === "string") {
             // Just a string: add a property to the current module in the current model.
             const module = accModel[moduleName] || []
+            const functionName = sanitiseFunctionName(sourcePropKey)
+            if (module.some(fn => fn.elmName === functionName))
+                throw new JsonError(`duplicate function found: '${functionName}' (in module '${moduleName}').`)
             const fn = {
-                elmName: sanitiseFunctionName(sourcePropKey),
+                elmName: functionName,
                 jsonName,
                 parameters: parseParams(sourcePropValue)
             }
             return {...accModel, [moduleName]: [...module, fn]}
         } else {
             // This key in the source groups together a bunch of children: create a new module for these.
-            return buildModel(sourcePropValue, accModel, `${moduleName}.${sanitiseModuleName(sourcePropKey)}`, jsonName)
+            const childModuleName = `${moduleName}.${sanitiseModuleName(sourcePropKey)}`
+            if (accModel[childModuleName])
+                throw new JsonError(`duplicate module found: '${childModuleName}'.`)
+            return buildModel(sourcePropValue, accModel, childModuleName, jsonName)
         }
     }, initialModel)
 

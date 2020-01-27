@@ -509,6 +509,22 @@ describe("model-builder", () => {
                     "The supplied JSON file has a problem in it: '!^&£$' is not a valid parameter name."
                 )
             })
+
+            it("throws error on duplicate module name", () => {
+                assert.throws(
+                    () => build({"^Test": {test: ""}, "!Test": {test: ""}}),
+                    JsonError,
+                    "The supplied JSON file has a problem in it: duplicate module found: 'Translations.Test'."
+                )
+            })
+
+            it("throws error on duplicate function name", () => {
+                assert.throws(
+                    () => build({"^test": "", "!Test": ""}),
+                    JsonError,
+                    "The supplied JSON file has a problem in it: duplicate function found: 'test' (in module 'Translations')."
+                )
+            })
         })
     })
 })

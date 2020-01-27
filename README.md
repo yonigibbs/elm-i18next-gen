@@ -239,8 +239,6 @@ to change this: maybe just put the files in the trash can / waste bin / recycle 
 
 
 ## TODO
-* Handle duplicates (functions, parameters and modules): not possible directly in JSON but because of sanitisation this
-could actually occur.
 * Add tests that call `elm-test` on generated code to make sure it's valid?
 * Add "integration test" that runs a new Node process with cmd-line args to make sure all works as expected.
   * Test all cmd line args, including `watch` mode.
@@ -254,6 +252,7 @@ could actually occur.
 * Allow user more control over generated files (e.g. hard-coded default of "Translations" as top-level module).
 * Publish as NPM package (update instructions in readme after this done).
 * Add quickstart section to readme after available in NPM.
+* Update handling of errors in JSON: provide a list of all errors rather than fail as soon as an error is hit?
 
 
 ## Maintaining
