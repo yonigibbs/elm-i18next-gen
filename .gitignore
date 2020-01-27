@@ -5,11 +5,15 @@
 
 /node_modules/
 
-# Folder where we generate code to run elm-format against it to make sure the code we generated is valid.
-elm-format-validate/
-
 # File added when launching Dolphin from IntelliJ.
 .directory
+
+# Elm
+elm-sandbox/elm-stuff/
+
+# Generated Elm files for testing
+elm-sandbox/src/Translations.elm
+elm-sandbox/src/Translations/
 
 # End Custom
 
