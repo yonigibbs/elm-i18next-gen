@@ -133,6 +133,13 @@ Optionally, the following arguments can also be supplied:
 argument isn't supplied and any of the target files exist, the process will abort. See the [Overwriting](#overwriting)
 section below for further details.
 * `--watch` (short form `-w`): Watches the source file for changes and regenerates the code whenever it does.
+* `--fallback` (short form `-w`): Generates functions which receive a list of fallback languages. The generated functions
+will use [tf](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest/I18Next#tf) and
+[trf](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest/I18Next#trf) instead of
+[t](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest/I18Next#t) and
+[tr](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest/I18Next#tr).
+
+Details on the command-line arguments are also available by running with the `--help` argument.
 
 Below is an example of running `elm-i18next-gen` using `npx`, including the arguments:
 
@@ -232,17 +239,18 @@ to change this: maybe just put the files in the trash can / waste bin / recycle 
 
 
 ## TODO
-* Handle translations with fallbacks (`tf` and `trf`).
 * Handle duplicates (functions, parameters and modules): not possible directly in JSON but because of sanitisation this
 could actually occur.
+* Add tests that call `elm-test` on generated code to make sure it's valid?
+* Add "integration test" that runs a new Node process with cmd-line args to make sure all works as expected.
+  * Test all cmd line args, including `watch` mode.
 * Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
 (https://github.com/sindresorhus/trash ?) Make this configurable via an arg?
-* Add command-line-usage (i.e. handle `--help`): see https://github.com/75lb/command-line-usage (or swap to commander?)
 * Validation of supplied target folder (valid path, not a file, etc.)
-* Tests for all cmd-line args/behaviour (e.g. watch).
 * Allow parameter delimiter to be configured (currently hard-coded to `Curly`).
 * Allow to work with older versions of Node (which didn't have recursive folder creation).
 * TODOs in the code.
+* Improve console updates in `watch` mode: don't completely clear the console - keep cmd that was issued visible.
 * Allow user more control over generated files (e.g. hard-coded default of "Translations" as top-level module).
 * Publish as NPM package (update instructions in readme after this done).
 * Add quickstart section to readme after available in NPM.

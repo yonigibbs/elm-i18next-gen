@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="run-sample" type="NodeJSConfigurationType" application-parameters="--source test/resources/sample1.json --target /tmp/i18n-unit-test/index --overwrite" path-to-js-file="src/index.js" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="run-sample" type="NodeJSConfigurationType" application-parameters="--source test/resources/sample.json --target /tmp/i18n-unit-test/index --overwrite" path-to-js-file="src/index.js" working-dir="$PROJECT_DIR$">
     <method v="2" />
   </configuration>
 </component>

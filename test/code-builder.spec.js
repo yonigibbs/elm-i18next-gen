@@ -36,23 +36,41 @@ hello translations name =
 hello translations firstname middlename lastname =
     tr translations Curly "hello" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]`]
         }))
+
+    it("uses fallback languages if specified", () => test(
+        {
+            Translations: [
+                {elmName: "hello", jsonName: "hello", parameters: []},
+                {elmName: "helloWithName", jsonName: "helloWithName", parameters: [{elmName: "name", jsonName: "name"}]}
+            ]
+        },
+        {
+            ["Translations"]: [
+                `hello : List Translations -> String
+hello translations =
+    tf translations "hello"`,
+
+                `helloWithName : List Translations -> String -> String
+helloWithName translations name =
+    trf translations Curly "helloWithName" [ ( "name", name ) ]`]
+        }, true))
 })
 
 // Note that below we use "\n" rather than require("os").EOL because multiline string literals have "\n" in them even on
 // Windows. So to keep this consistent, just use "\n". If this becomes a problem we can swap from using multiline string
 // literals to single line ones and build multiline strings using EOL.
 
-const test = (model, expectedFiles) => {
-    const actualFiles = generateCode(model)
+const test = (model, expectedFiles, useFallbackLanguages = false) => {
+    const actualFiles = generateCode(model, useFallbackLanguages)
     const expectedFilesBuilt = Object.keys(expectedFiles).reduce(
         (acc, module) => ({
             ...acc,
-            [pathFromModuleName(module)]: buildFileStart(module) + elmFunctionsArrayToString(expectedFiles[module]) + "\n"
+            [pathFromModuleName(module)]: buildFileStart(module, useFallbackLanguages) + elmFunctionsArrayToString(expectedFiles[module])
         }), {})
     expect(actualFiles).to.deep.equal(expectedFilesBuilt)
 }
 
 const elmFunctionsArrayToString = elmFunctions =>
     elmFunctions.reduce(
-        (module, fn) => module + "\n\n" + fn,
+        (module, fn) => module + "\n\n" + fn + "\n",
         "")

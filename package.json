@@ -35,7 +35,7 @@
     "mocha": "^7.0.0"
   },
   "dependencies": {
-    "command-line-args": "^5.1.1",
+    "commander": "^4.1.0",
     "fs-extra": "^8.1.0"
   }
 }

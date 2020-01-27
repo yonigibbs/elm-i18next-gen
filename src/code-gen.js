@@ -71,7 +71,7 @@ const canOverwrite = targetFolder => {
  * The main entry point for the whole code generation process. Reads the supplied sourceFile, builds up a model representing
  * the data in it, builds the code for this, and finally writes that code to the file system as the supplied targetFolder.
  */
-module.exports = (sourceFile, targetFolder, overwrite = false) => {
+module.exports = (sourceFile, targetFolder, overwrite = false, useFallbackLanguages = false) => {
     const resolvedSourceFile = path.resolve(sourceFile)
     if (!fs.existsSync(resolvedSourceFile))
         throw new UserError(`The supplied source file does not exist: ${resolvedSourceFile}`)
@@ -89,7 +89,7 @@ module.exports = (sourceFile, targetFolder, overwrite = false) => {
         throw new UserError(`Translations already exist in specified target: ${resolvedTargetFolder}. Try again with the 'overwrite' flag?`)
 
     const source = readSourceFile(resolvedSourceFile)
-    const files = generateCode(build(source))
+    const files = generateCode(build(source), useFallbackLanguages)
 
     if (overwrite) {
         const submodulesFolder = path.join(resolvedTargetFolder, "Translations")
