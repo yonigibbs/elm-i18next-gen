@@ -1,26 +1,26 @@
 "use strict"
 
 const {expect, assert} = require("chai")
-const build = require("../src/model-builder")
+const buildModel = require("../src/model-builder")
 const JsonError = require("../src/json-error")
 
 describe("model-builder", () => {
 
     describe("basic model building", () => {
         it("handles single file with one resources (no params)", () => {
-            expect(build({"hello": "Hello"})).to.deep.equal({
+            expect(buildModel({"hello": "Hello"})).to.deep.equal({
                 Translations: [{elmName: "hello", jsonName: "hello", parameters: []}]
             })
         })
 
         it("handles single file with one resource (one param)", () => {
-            expect(build({"hello": "Hello {{name}}"})).to.deep.equal({
+            expect(buildModel({"hello": "Hello {{name}}"})).to.deep.equal({
                 Translations: [{elmName: "hello", jsonName: "hello", parameters: [{elmName: "name", jsonName: "name"}]}]
             })
         })
 
         it("handles single file with one resources (three params)", () => {
-            expect(build({"hello": "Hello {{firstname}} {{middlename}} {{lastname}}!"})).to.deep.equal({
+            expect(buildModel({"hello": "Hello {{firstname}} {{middlename}} {{lastname}}!"})).to.deep.equal({
                 Translations: [{
                     elmName: "hello", jsonName: "hello", parameters: [
                         {elmName: "firstname", jsonName: "firstname"},
@@ -32,7 +32,7 @@ describe("model-builder", () => {
         })
 
         it("handles single submodule (no params)", () => {
-            expect(build({
+            expect(buildModel({
                 hello: "Hello",
                 greetings: {
                     goodDay: "Good day."
@@ -47,7 +47,7 @@ describe("model-builder", () => {
         })
 
         it("handles multiple submodules (with and without params)", () => {
-            expect(build({
+            expect(buildModel({
                 hello: "Hello",
                 helloWithParams: "Hello {{firstname}} {{middlename}} {{lastname}}!",
                 greetings: {
@@ -123,7 +123,7 @@ describe("model-builder", () => {
         })
 
         it("handles duplicate parameter", () => {
-            expect(build({test: "test {{param1}} {{param2}} {{param1}} this"})).to.deep.equal({
+            expect(buildModel({test: "test {{param1}} {{param2}} {{param1}} this"})).to.deep.equal({
                 Translations: [{
                     elmName: "test",
                     jsonName: "test",
@@ -139,7 +139,7 @@ describe("model-builder", () => {
     describe("sanitisation", () => {
         describe("capitalisation", () => {
             it("capitalises first letter of module names", () => {
-                expect(build({
+                expect(buildModel({
                     test: "",
                     nested: {
                         test: "",
@@ -159,7 +159,7 @@ describe("model-builder", () => {
             })
 
             it("decapitalises first letter of function names", () => {
-                expect(build({
+                expect(buildModel({
                     TestSomeValue: "",
                     nested: {
                         TestSomeOtherValue: "",
@@ -183,7 +183,7 @@ describe("model-builder", () => {
             })
 
             it("decapitalises first letter of parameter names", () => {
-                expect(build({
+                expect(buildModel({
                     testSomeValue: "some {{P1Abc}} {{P2Def}} value",
                     nested: {
                         testSomeOtherValue: "some {{P3Abc}} {{P4Def}} value",
@@ -218,7 +218,7 @@ describe("model-builder", () => {
             })
 
             it("joins words and pascal cases module names", () => {
-                expect(build({
+                expect(buildModel({
                     test: "",
                     "nested module": {
                         test: "",
@@ -270,7 +270,7 @@ describe("model-builder", () => {
             })
 
             it("joins words and camel cases function names", () => {
-                expect(build({
+                expect(buildModel({
                     "test some value": "",
                     nested: {
                         "test-some other_value": "",
@@ -294,7 +294,7 @@ describe("model-builder", () => {
             })
 
             it("joins words and camel cases parameter names", () => {
-                expect(build({
+                expect(buildModel({
                     testSomeValue: "some {{P1-abc_def ghi}} {{P2-abc_def ghi}} value",
                     nested: {
                         testSomeOtherValue: "some {{P3-abc_def ghi}} {{P4-abc_def ghi}} value",
@@ -330,7 +330,7 @@ describe("model-builder", () => {
 
         describe("white space handling", () => {
             it("trims white space around module names", () => {
-                expect(build({
+                expect(buildModel({
                     "  nested  ": {
                         test: "",
                         "  subNested  ": {
@@ -348,7 +348,7 @@ describe("model-builder", () => {
             })
 
             it("trims white space around function names", () => {
-                expect(build({
+                expect(buildModel({
                     nested: {
                         "  test  ": "",
                         subNested: {
@@ -366,7 +366,7 @@ describe("model-builder", () => {
             })
 
             it("trims white space around parameter names", () => {
-                expect(build({
+                expect(buildModel({
                     nested: {
                         test: "some {{  p1  }} value",
                         subNested: {
@@ -388,7 +388,7 @@ describe("model-builder", () => {
             })
 
             it("removes white space in module names", () => {
-                expect(build({"  Nested  Sub    Module  ": {test: ""}})).to.deep.equal({
+                expect(buildModel({"  Nested  Sub    Module  ": {test: ""}})).to.deep.equal({
                     "Translations.NestedSubModule": [{
                         elmName: "test", jsonName: "  Nested  Sub    Module  .test", parameters: []
                     }]
@@ -396,7 +396,7 @@ describe("model-builder", () => {
             })
 
             it("removes white space in function names", () => {
-                expect(build({"test  function  name": ""})).to.deep.equal({
+                expect(buildModel({"test  function  name": ""})).to.deep.equal({
                     "Translations": [{
                         elmName: "testFunctionName", jsonName: "test  function  name", parameters: []
                     }]
@@ -404,7 +404,7 @@ describe("model-builder", () => {
             })
 
             it("removes white space in parameter names", () => {
-                expect(build({test: "some {{param  1  a}} {{param  2  b}} value"})).to.deep.equal({
+                expect(buildModel({test: "some {{param  1  a}} {{param  2  b}} value"})).to.deep.equal({
                     "Translations": [{
                         elmName: "test", jsonName: "test", parameters: [
                             {elmName: "param1A", jsonName: "param  1  a"},
@@ -415,13 +415,13 @@ describe("model-builder", () => {
             })
 
             it("ignores parameters with just white space", () => {
-                expect(build({"key": "some {{   \t   }} value"})).to.deep.equal({
+                expect(buildModel({"key": "some {{   \t   }} value"})).to.deep.equal({
                     Translations: [{elmName: "key", jsonName: "key", parameters: []}]
                 })
             })
 
             it("allows empty translation", () => {
-                expect(build({test: ""})).to.deep.equal({
+                expect(buildModel({test: ""})).to.deep.equal({
                     "Translations": [{elmName: "test", jsonName: "test", parameters: []}]
                 })
             })
@@ -429,19 +429,19 @@ describe("model-builder", () => {
 
         describe("illegal character replacement", () => {
             it("removes illegal characters in module name", () => {
-                expect(build({"!Abc$.-_%:Def&": {test: ""}})).to.deep.equal({
+                expect(buildModel({"!Abc$.-_%:Def&": {test: ""}})).to.deep.equal({
                     "Translations.AbcDef": [{elmName: "test", jsonName: "!Abc$.-_%:Def&.test", parameters: []}]
                 })
             })
 
             it("removes illegal characters in function name", () => {
-                expect(build({"!Abc$.-_%:def&": ""})).to.deep.equal({
+                expect(buildModel({"!Abc$.-_%:def&": ""})).to.deep.equal({
                     "Translations": [{elmName: "abcDef", jsonName: "!Abc$.-_%:def&", parameters: []}]
                 })
             })
 
             it("removes illegal characters in parameter name", () => {
-                expect(build({test: "test {{!Abc$.-_%:def&}} value"})).to.deep.equal({
+                expect(buildModel({test: "test {{!Abc$.-_%:def&}} value"})).to.deep.equal({
                     "Translations": [{
                         elmName: "test", jsonName: "test", parameters: [{elmName: "abcDef", jsonName: "!Abc$.-_%:def&"}]
                     }]
@@ -449,7 +449,7 @@ describe("model-builder", () => {
             })
 
             it("prefixes numbers in module/function/parameter", () => {
-                expect(build({"12": {"34": "some {{56}} {{78}} value"}})).to.deep.equal({
+                expect(buildModel({"12": {"34": "some {{56}} {{78}} value"}})).to.deep.equal({
                     "Translations.T12": [{
                         elmName: "t34", jsonName: "12.34", parameters: [
                             {elmName: "t56", jsonName: "56"},
@@ -460,7 +460,7 @@ describe("model-builder", () => {
             })
 
             it("ignores blank parameters", () => {
-                expect(build({test: "some {{}} value {{  }}"})).to.deep.equal({
+                expect(buildModel({test: "some {{}} value {{  }}"})).to.deep.equal({
                     "Translations": [{elmName: "test", jsonName: "test", parameters: []}]
                 })
             })
@@ -469,7 +469,7 @@ describe("model-builder", () => {
         describe("error handling", () => {
             it("throws error if module name blank", () => {
                 assert.throws(
-                    () => build({"  ": {test: ""}}),
+                    () => buildModel({"  ": {test: ""}}),
                     JsonError,
                     "The supplied JSON file has a problem in it: a module with no ID was found."
                 )
@@ -478,7 +478,7 @@ describe("model-builder", () => {
             it("throws error if module has no valid characters", () => {
                 // noinspection NonAsciiCharacters
                 assert.throws(
-                    () => build({" !^&£$ ": {test: ""}}),
+                    () => buildModel({" !^&£$ ": {test: ""}}),
                     JsonError,
                     "The supplied JSON file has a problem in it: ' !^&£$ ' is not a valid module name."
                 )
@@ -486,7 +486,7 @@ describe("model-builder", () => {
 
             it("throws error if function name blank", () => {
                 assert.throws(
-                    () => build({test: {"  ": ""}}),
+                    () => buildModel({test: {"  ": ""}}),
                     JsonError,
                     "The supplied JSON file has a problem in it: a function with no ID was found."
                 )
@@ -495,7 +495,7 @@ describe("model-builder", () => {
             it("throws error if function has no valid characters", () => {
                 // noinspection NonAsciiCharacters
                 assert.throws(
-                    () => build({" !^&£$ ": ""}),
+                    () => buildModel({" !^&£$ ": ""}),
                     JsonError,
                     "The supplied JSON file has a problem in it: ' !^&£$ ' is not a valid function name."
                 )
@@ -504,7 +504,7 @@ describe("model-builder", () => {
             it("throws error if parameter has no valid characters", () => {
                 // noinspection NonAsciiCharacters
                 assert.throws(
-                    () => build({test: "some {{!^&£$}} value"}),
+                    () => buildModel({test: "some {{!^&£$}} value"}),
                     JsonError,
                     "The supplied JSON file has a problem in it: '!^&£$' is not a valid parameter name."
                 )
@@ -512,7 +512,7 @@ describe("model-builder", () => {
 
             it("throws error on duplicate module name", () => {
                 assert.throws(
-                    () => build({"^Test": {test: ""}, "!Test": {test: ""}}),
+                    () => buildModel({"^Test": {test: ""}, "!Test": {test: ""}}),
                     JsonError,
                     "The supplied JSON file has a problem in it: duplicate module found: 'Translations.Test'."
                 )
@@ -520,7 +520,7 @@ describe("model-builder", () => {
 
             it("throws error on duplicate function name", () => {
                 assert.throws(
-                    () => build({"^test": "", "!Test": ""}),
+                    () => buildModel({"^test": "", "!Test": ""}),
                     JsonError,
                     "The supplied JSON file has a problem in it: duplicate function found: 'test' (in module 'Translations')."
                 )

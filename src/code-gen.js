@@ -2,8 +2,8 @@
 
 const fs = require("fs-extra")
 const path = require("path")
-const build = require("./model-builder")
-const generateCode = require("./code-builder")
+const buildModel = require("./model-builder")
+const buildCode = require("./code-builder")
 const writeFiles = require("./file-writer")
 const UserError = require("./user-error")
 const JsonError = require("./json-error")
@@ -89,7 +89,8 @@ module.exports = (sourceFile, targetFolder, overwrite = false, useFallbackLangua
         throw new UserError(`Translations already exist in specified target: ${resolvedTargetFolder}. Try again with the 'overwrite' flag?`)
 
     const source = readSourceFile(resolvedSourceFile)
-    const files = generateCode(build(source), useFallbackLanguages)
+    const model = buildModel(source)
+    const files = buildCode(model, useFallbackLanguages)
 
     if (overwrite) {
         const submodulesFolder = path.join(resolvedTargetFolder, "Translations")

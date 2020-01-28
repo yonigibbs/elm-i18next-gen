@@ -81,28 +81,37 @@ const parseParams = translationText => {
  * passed in, so this function can call itself recursively.
  */
 const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.keys(source).reduce(
-    // TODO: trap error and wrap/throw to add information about which key caused the problem.
     (accModel, sourcePropKey) => {
-        const sourcePropValue = source[sourcePropKey]
         const jsonName = moduleJsonPath ? `${moduleJsonPath}.${sourcePropKey}` : sourcePropKey
-        if (typeof sourcePropValue === "string") {
-            // Just a string: add a property to the current module in the current model.
-            const module = accModel[moduleName] || []
-            const functionName = sanitiseFunctionName(sourcePropKey)
-            if (module.some(fn => fn.elmName === functionName))
-                throw new JsonError(`duplicate function found: '${functionName}' (in module '${moduleName}').`)
-            const fn = {
-                elmName: functionName,
-                jsonName,
-                parameters: parseParams(sourcePropValue)
+        try {
+            const sourcePropValue = source[sourcePropKey]
+            if (typeof sourcePropValue === "string") {
+                // Just a string: add a property to the current module in the current model.
+                const module = accModel[moduleName] || []
+                const functionName = sanitiseFunctionName(sourcePropKey)
+                if (module.some(fn => fn.elmName === functionName))
+                    throw new JsonError(`duplicate function found: '${functionName}' (in module '${moduleName}').`)
+                const fn = {
+                    elmName: functionName,
+                    jsonName,
+                    parameters: parseParams(sourcePropValue)
+                }
+                return {...accModel, [moduleName]: [...module, fn]}
+            } else {
+                // This key in the source groups together a bunch of children: create a new module for these.
+                const childModuleName = `${moduleName}.${sanitiseModuleName(sourcePropKey)}`
+                if (accModel[childModuleName])
+                    throw new JsonError(`duplicate module found: '${childModuleName}'.`)
+                return buildModel(sourcePropValue, accModel, childModuleName, jsonName)
             }
-            return {...accModel, [moduleName]: [...module, fn]}
-        } else {
-            // This key in the source groups together a bunch of children: create a new module for these.
-            const childModuleName = `${moduleName}.${sanitiseModuleName(sourcePropKey)}`
-            if (accModel[childModuleName])
-                throw new JsonError(`duplicate module found: '${childModuleName}'.`)
-            return buildModel(sourcePropValue, accModel, childModuleName, jsonName)
+        } catch (err) {
+            if (err instanceof JsonError)
+                // Already one of our errors: just rethrow
+                throw err
+            else
+                // Something went wrong: report it, but include the details of where this occurred in the JSON so the
+                // user has a better chance of fixing the problem.
+                throw new JsonError(`Error processing entry at '${jsonName}': ${err.message}`)
         }
     }, initialModel)
 

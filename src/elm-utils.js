@@ -8,8 +8,9 @@ const path = require("path")
  */
 const moduleNameFromPath = filePath => {
     const {dir, name} = path.parse(filePath)
-    return dir
-        ? dir.split(path.sep).filter(s => !!s).join(".") + "." + name
+    const dirParts = dir.split(path.sep).filter(s => !!s)
+    return dirParts.length
+        ? dirParts.join(".") + "." + name
         : name
 }
 
@@ -18,7 +19,6 @@ const moduleNameFromPath = filePath => {
  * returned value is `"Translations/Greetings.elm"`.
  */
 const pathFromModuleName = moduleName => moduleName.replace(/\./g, path.sep) + ".elm"
-
 
 /**
  * Builds up the start of the code for a module with the passed in name.

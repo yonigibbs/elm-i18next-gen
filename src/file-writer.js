@@ -2,9 +2,11 @@
 
 const fs = require("fs-extra")
 const path = require("path")
+const UserError = require("./user-error")
 
 /**
  * Writes the content of the passed in files (see "./code-builder") to the file system at the passed in folder path.
+ * Also responsible for deleted items
  */
 module.exports = (rootPath, files) => {
     Object.keys(files).forEach(filename => {
@@ -12,11 +14,15 @@ module.exports = (rootPath, files) => {
         const dirname = path.dirname(fullFilePath)
         fs.ensureDirSync(dirname)
 
-        // TODO: check what happens if file path exists, but is a folder rather than a file.
+        const exists = fs.existsSync(fullFilePath)
+
+        if (exists && fs.lstatSync(fullFilePath).isDirectory())
+            // Exists, but is a folder: throw an error
+            throw new UserError(`Tried to write to file but couldn't because it exists as a folder: '${fullFilePath}'`)
 
         // Before writing this content out read the existing content: if nothing's changed, don't write the content out
         // to avoid unnecessary changes in git, file dates, etc.
-        if (!fs.existsSync(fullFilePath) || fs.readFileSync(fullFilePath) !== files[filename])
+        if (!exists || fs.readFileSync(fullFilePath) !== files[filename])
             fs.writeFileSync(fullFilePath, files[filename])
     })
 }

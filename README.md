@@ -15,6 +15,9 @@ to worry about translations being out-of-sync with the code.
 
 
 ## Motivation
+_(If you're not interested, and just want to start using `elm-i18next-gen`, skip to the [Installation](#installation)
+section below.)_
+
 In Elm there are various approaches to solve the problem of internationalization, including
 [elm-i18n](https://github.com/iosphere/elm-i18n), [i18n-to-elm](https://github.com/dragonwasrobot/i18n-to-elm),
 [elm-i18n-module-generator](https://github.com/ChristophP/elm-i18n-module-generator) and
@@ -233,39 +236,18 @@ no need for the `Translations` folder at all, as there are no submodules to gene
 previously created `Translations` folder?
 
 The way `elm-i18next-gen` handles this is by deleting any files and folders previously generated in the `Translations`
-folder, if the newly supplied JSON no longer requires them. It also deletes the `Translations` folder itself if it's no
-longer required. Clearly this is potentially dangerous: files are being deleted! There's a [TODO](#todo) item noted below
-to change this: maybe just put the files in the trash can / waste bin / recycle bin instead.
+folder, if the newly supplied JSON no longer references them. It also deletes the `Translations` folder itself if it's no
+longer required. Clearly this is potentially dangerous: files are being deleted! If you'd like to use this tool but don't
+like this (i.e. you'd prefer the files to be put in the trash can / waste bin / recycle bin instead) please log an issue.
 
 
-## TODO
-* Revisit idea of deleting files in Translations folder: is this safe? Can we put them in wastebin instead?
-(https://github.com/sindresorhus/trash ?) Make this configurable via an arg?
-* Validation of supplied target folder (valid path, not a file, etc.)
+## Future Enhancements
+Below is a list of possible future enhancements to add to `elm-i18next-gen`. If any of these are important to you, please
+log an issue and I'll try my best to implement them as soon as I can.
 * Allow parameter delimiter to be configured (currently hard-coded to `Curly`).
 * Allow to work with older versions of Node (which didn't have recursive folder creation).
-* TODOs in the code.
-* Improve console updates in `watch` mode: don't completely clear the console - keep cmd that was issued visible.
 * Allow user more control over generated files (e.g. hard-coded default of "Translations" as top-level module).
-* Publish as NPM package (update instructions in readme after this done).
-* Add quickstart section to readme after available in NPM.
 * Update handling of errors in JSON: provide a list of all errors rather than fail as soon as an error is hit?
-
-
-## Maintaining
-### Note for IntelliJ users
-When first opening the project, you might see some warnings about unresolved variables in node-specific code:
-
-![Unresolved Node variables](docs/images/unresolved-node-variables.png)
-
-To get round this go to **Settings --> Languages & Frameworks --> Node.js and NPM** and tick the
-**Coding assistance for Node.js** checkbox:
-
-![Coding assistance for Node.js](docs/images/node-coding-assistance.png)
-
-Then, when prompted, select the `elm-i18next-gen` module:
-
-![Node coding assistance module selection](docs/images/node-coding-assistance-select-module.png)
 
 
 ## Thanks

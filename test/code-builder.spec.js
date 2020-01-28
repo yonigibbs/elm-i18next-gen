@@ -1,7 +1,7 @@
 "use strict"
 
 const {expect} = require("chai")
-const generateCode = require("../src/code-builder")
+const buildCode = require("../src/code-builder")
 const {buildFileStart, pathFromModuleName} = require("../src/elm-utils")
 
 describe("code-builder", () => {
@@ -61,7 +61,7 @@ helloWithName translations name =
 // literals to single line ones and build multiline strings using EOL.
 
 const test = (model, expectedFiles, useFallbackLanguages = false) => {
-    const actualFiles = generateCode(model, useFallbackLanguages)
+    const actualFiles = buildCode(model, useFallbackLanguages)
     const expectedFilesBuilt = Object.keys(expectedFiles).reduce(
         (acc, module) => ({
             ...acc,
