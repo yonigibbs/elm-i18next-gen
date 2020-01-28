@@ -10,7 +10,7 @@ const UserError = require("./user-error")
 const JsonError = require("./json-error")
 
 program
-    .version("1.0.0")
+    .version("1.0.1")
     .requiredOption("-s, --source <source>", "The source file containing the JSON which contains the translations.")
     .requiredOption("-t, --target <target>",
         "The folder in which the source files are to be generated. Can be absolute or relative to current folder.")
