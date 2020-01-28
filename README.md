@@ -81,18 +81,17 @@ These values are still read from the source JSON object at runtime. This means t
 string values are updated, the code doesn't have to change (unless of course the translation IDs or placeholders change).
 
 
-## Installation
-This package is not currently published to the npm registry, but hopefully will be soon. In the meantime to install it
-run the following command, which will install it directly from this GitHub repo:
-
-```sh
-npm install --save-dev https://github.com/yonigibbs/elm-i18next-gen.git
-```
-
 ## Pre-requisites
 `elm-i18next-gen` only works on Node 12 or higher. It can be made to work on earlier versions if required: log an issue
 if you need this.
 
+
+## Installation
+Install this package from npm:
+
+```sh
+npm install --save-dev elm-i18next-gen
+```
 
 ## Usage
 `elm-i18next-gen` can be run directly using `npx` or by adding a new entry to the `scripts` section of `package.json`

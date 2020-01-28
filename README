@@ -1,0 +1,24 @@
+# Code Generation for [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
+
+[![Actions Status](https://github.com/yonigibbs/elm-i18next-gen/workflows/Node%20CI/badge.svg)](https://github.com/yonigibbs/elm-i18next-gen/actions)
+
+
+## Overview
+`elm-i18next-gen` is a tool for handling internationalization in Elm projects. It combines type safety with dynamic
+translation loading, allowing for a smoother translation process and smaller bundles than existing solutions, while
+maintaining type safety.
+
+This tool generates code which uses the [elm-i18next](https://package.elm-lang.org/packages/ChristophP/elm-i18next/latest)
+package to read text values from a source JSON object. If a change is made to the source JSON object `elm-i18next-gen`
+ensures the corresponding change required in the code is found at compile-time, not at runtime. This means you don't need
+to worry about translations being out-of-sync with the code.
+
+
+## Installation
+```sh
+npm install --save-dev elm-i18next-gen
+```
+
+## Usage
+See [documentation in the GitHub repo](https://github.com/yonigibbs/elm-i18next-gen#code-generation-for-elm-i18next) for
+information on how to use this tool.

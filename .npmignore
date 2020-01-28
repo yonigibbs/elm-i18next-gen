@@ -1,6 +1,9 @@
 .github/
 .idea/
 docs/
+elm-sandbox/
 test/
 .eslintrc.js
 .gitignore
+CONTRIBUTING.md
+README.md
