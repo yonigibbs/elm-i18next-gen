@@ -243,7 +243,6 @@ like this (i.e. you'd prefer the files to be put in the trash can / waste bin / 
 Below is a list of possible future enhancements to add to `elm-i18next-gen`. If any of these are important to you, please
 log an issue and I'll try my best to implement them as soon as I can.
 * Allow parameter delimiter to be configured (currently hard-coded to `Curly`).
-* Allow to work with older versions of Node (which didn't have recursive folder creation).
 * Allow user more control over generated files (e.g. hard-coded default of "Translations" as top-level module).
 * Update handling of errors in JSON: provide a list of all errors rather than fail as soon as an error is hit?
 
