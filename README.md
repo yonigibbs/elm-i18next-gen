@@ -82,8 +82,7 @@ string values are updated, the code doesn't have to change (unless of course the
 
 
 ## Pre-requisites
-`elm-i18next-gen` only works on Node 12 or higher. It can be made to work on earlier versions if required: log an issue
-if you need this.
+`elm-i18next-gen` requires Node 10 or higher.
 
 
 ## Installation
