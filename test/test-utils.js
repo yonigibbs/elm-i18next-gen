@@ -8,14 +8,21 @@ const {buildFileStart} = require("../src/elm-utils")
  * Gets all files under the passed in path, recursively. Returns an array of the files, each one's value being its path
  * relative to the passed in path.
  */
-const getAllFiles = parent =>
-    fs.readdirSync(parent)
+const getAllFiles = parent => {
+    const children = fs.readdirSync(parent)
+
+    // flatMap only available in Node 12+, so for earlier versions define our own.
+    if (!children.flatMap)
+        children.flatMap = fn => children.map(fn).reduce((acc, cur) => acc.concat(cur), [])
+
+    return children
         .flatMap(child => {
             const fullChildPath = path.join(parent, child)
             return fs.lstatSync(fullChildPath).isDirectory()
                 ? getAllFiles(fullChildPath).map(subChild => path.join(child, subChild))
                 : child
         })
+}
 
 module.exports = {
     /**

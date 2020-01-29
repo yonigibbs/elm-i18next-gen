@@ -112,7 +112,7 @@ describe("code-gen", () => {
         const createNestedFolderStructure = parent => {
             const childFolder = path.join(parent, "child")
             const grandchildFolder = path.join(childFolder, "grandchild")
-            fs.mkdirpSync(grandchildFolder, {recursive: true})
+            fs.mkdirpSync(grandchildFolder)
             fs.writeFileSync(path.join(childFolder, "file1.txt"), "Test")
             fs.writeFileSync(path.join(grandchildFolder, "file2.txt"), "Test")
         }

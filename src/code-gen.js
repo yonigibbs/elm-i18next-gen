@@ -29,7 +29,7 @@ const deleteRemovedItems = (parentFolder, generatedFiles, pathRelativeToRoot) =>
                     // further children which should be deleted.
                     deleteRemovedItems(fullChildPath, generatedFiles, child)
                 else
-                    fs.rmdirSync(fullChildPath, {recursive: true})
+                    fs.removeSync(fullChildPath)
             } else {
                 // Child is a file: check if this file is found in the passed in list of generated files.
                 const childFilePathRelativeToRoot = pathRelativeToRoot + path.sep + child
@@ -40,7 +40,7 @@ const deleteRemovedItems = (parentFolder, generatedFiles, pathRelativeToRoot) =>
         })
     } else
         // Nothing in this folder: delete it.
-        fs.rmdirSync(parentFolder, {recursive: true})
+        fs.removeSync(parentFolder)
 }
 
 /** Parses the passed in JSON file and returns its content. Errors in parsing are reported in a JsonError */

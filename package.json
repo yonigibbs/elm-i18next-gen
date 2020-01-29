@@ -17,6 +17,7 @@
     "elm-test-validate": "cd elm-sandbox && elm-test && cd -"
   },
   "author": "Yoni Gibbs",
+  "keywords": ["elm", "internationalization", "internationalisation", "i18n", "i18next", "elm-i18next"],
   "license": "ISC",
   "bin": {
     "elm-i18next-gen": "bin/elm-i18next-gen"
