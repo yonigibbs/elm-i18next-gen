@@ -1,6 +1,6 @@
 {
   "name": "elm-i18next-gen",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Code generation for elm-i18next",
   "main": "index.js",
   "repository": {
@@ -17,7 +17,14 @@
     "elm-test-validate": "cd elm-sandbox && elm-test && cd -"
   },
   "author": "Yoni Gibbs",
-  "keywords": ["elm", "internationalization", "internationalisation", "i18n", "i18next", "elm-i18next"],
+  "keywords": [
+    "elm",
+    "internationalization",
+    "internationalisation",
+    "i18n",
+    "i18next",
+    "elm-i18next"
+  ],
   "license": "ISC",
   "bin": {
     "elm-i18next-gen": "bin/elm-i18next-gen"
