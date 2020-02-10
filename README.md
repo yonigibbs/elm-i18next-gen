@@ -19,7 +19,7 @@ to worry about translations being out-of-sync with the code.
 
 
 ## Installation
-Install this package from npm:
+Install `elm-i18next-gen` from npm:
 
 ```shell script
 npm install --save-dev elm-i18next-gen
@@ -27,8 +27,8 @@ npm install --save-dev elm-i18next-gen
 
 
 ## Getting Started
-This section assumes you are not already familiar with the `elm-i18next` package, and aren't using it already. If this
-doesn't apply to you, please see the [next section](#adding-to-a-project-already-using-elm-i18next).
+This section assumes you are not already using the `elm-i18next` package. If this doesn't apply to you, please see the
+[next section](#adding-to-a-project-already-using-elm-i18next).
 
 1. Install `elm-i18next` by running this at the root of your project:
     ```shell script
@@ -58,7 +58,8 @@ you're writing the code). As an example, let's imagine your JSON file is called 
    for the current user. For example it could do this based on the user's locale by interrogating the
    [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) HTTP header.
 
-1. Update the Elm code to initialize your model with the translations from the flags, e.g.:
+1. Update your Elm code by creating a field in your model to store the translations, and initializing it with the data
+from the `flags`, e.g.:
 
    ```elm
    import I18Next
@@ -80,7 +81,7 @@ you're writing the code). As an example, let's imagine your JSON file is called 
    ```
 
 1. Run `elm-i18next-gen` to generate functions that will provide access to the translations above. As an example, let's
-imagine your project is structured out as follows:
+imagine your project is structured as follows:
 
    ```
    my-project/
@@ -102,11 +103,11 @@ imagine your project is structured out as follows:
    ```
    
    _(Note that if you run the command above more than once, it will fail. Simply add `--overwrite` to get round this. See
-   [Command Line Arguments](#command-line-arguments) for more information.)_
+   [Command-line Arguments](#command-line-arguments) for more information.)_
    
    This will create a file called `src/Translations.elm`. This is an Elm module that you can import into your code. In
    this module there will be one function per translation in the JSON file. You can use it as shown below. (As an example
-   here let's assume there's a `username` property on the model.)
+   here let's assume there's a `username` field on the model.)
    
    ```elm
    import Translations
@@ -119,14 +120,14 @@ imagine your project is structured out as follows:
    
 
 ### Adding to a project already using `elm-i18next` 
-If you are already using `elm-i18next`, you can integrate `elm-i18next-gen` into your project quite easily. Install it
+If you are already using `elm-i18next` you can integrate `elm-i18next-gen` into your project quite easily. Install it
 as per the [installation instructions](#installation), and run it as explained in the last point above. You can now
 import the generated `Translations.elm` module into your code and start using it instead of calling the existing
-functions from `elm-i18next`. You can either leave existing code as it is, or migrate it to use the generated code:
+functions from `elm-i18next`. You can either leave existing code as it is, or migrate it to use the new generated code:
 using the the generated functions alongside the existing `elm-i18next` functions is fine.
 
-The one point to note is that the generated module is called `Translations`, but there's already a module in `elm-i8next`
-of the same name. So when importing you'll need to use fully qualified imports or an alias to distinguish between the two.
+One point to note is that the generated module is called `Translations`, but there's already a module in `elm-i8next` of
+the same name. So when importing you'll need to use fully qualified imports or an alias to distinguish between the two.
 
 
 ## Motivation
