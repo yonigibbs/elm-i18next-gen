@@ -52,10 +52,19 @@ you're writing the code). As an example, let's imagine your JSON file is called 
    Elm.Main.init({ flags: translations });
    ```
    
-   Here, `translations` can either be a JavaScript object literal or a string containing the JSON.
+   Here, `translations` can either be a JavaScript object literal or a string containing the JSON. Typically this would
+   be fetched from somewhere, e.g.:
    
-   The JavaScript code, or the server-side code generating the JavaScript code, can choose the relevant translation file
-   for the current user. For example it could do this based on the user's locale by interrogating the
+   ```js
+   const translations = await fetch('/path/to/files/translations.en.json');
+   Elm.Main.init({ flags: translations });
+   ```
+   
+   Alternatively it could be pre-rendered into the JavaScript on the server-side, or it can be fetched from within the
+   Elm code itself, as mentioned [here](https://github.com/ChristophP/elm-i18next/tree/master#fetching-translations).
+   
+   The JavaScript code, or the server-side code generating the JavaScript, can choose the relevant translation file for
+   the current user. For example the server could do this based on the user's locale by interrogating the
    [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) HTTP header.
 
 1. Update your Elm code by creating a field in your model to store the translations, and initializing it with the data
