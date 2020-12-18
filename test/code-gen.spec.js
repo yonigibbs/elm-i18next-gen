@@ -6,8 +6,14 @@ const fs = require("fs-extra")
 const path = require("path")
 const executeCodeGeneration = require("../src/code-gen")
 const UserError = require("../src/user-error")
-const {getAllFilesContent, expectedSampleFileContent, expectedNestedModulesFileContent, expectedEmptyModulesFileContent} =
-    require("./test-utils")
+const {
+    getAllFilesContent,
+    expectedSampleFileContent,
+    expectedSampleFileContentBoth,
+    expectedNestedModulesFileContent,
+    expectedEmptyModulesFileContent,
+    expectedSampleFileContentCustom
+} = require("./test-utils")
 
 const sourceFile = path.join(__dirname, "resources/sample.json")
 const targetFolder = path.join(os.tmpdir(), "i18n-unit-test/code-gen")
@@ -19,6 +25,16 @@ describe("code-gen", () => {
     it("generates sample file", () => {
         executeCodeGeneration(sourceFile, targetFolder)
         expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedSampleFileContent)
+    })
+
+    it("generates sample file with custom translation type", () => {
+        executeCodeGeneration(sourceFile, targetFolder, false, false, "custom")
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedSampleFileContentCustom)
+    })
+
+    it("generates sample file with both translation types", () => {
+        executeCodeGeneration(sourceFile, targetFolder, false, false, "both")
+        expect(getAllFilesContent(targetFolder)).to.deep.equal(expectedSampleFileContentBoth)
     })
 
     it("ignores empty modules", () => {

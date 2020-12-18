@@ -8,6 +8,7 @@ const program = require("commander")
 const executeCodeGeneration = require("./code-gen")
 const UserError = require("./user-error")
 const JsonError = require("./json-error")
+const {translationTypes} = require("./translation-type-utils")
 
 program
     .version(require("../package.json").version)
@@ -18,15 +19,20 @@ program
         "Ensures that if the any of the target files exist, they will be overwritten. If this argument isn't supplied and any of the target files exist, the process will abort.")
     .option("-w, --watch", "Watches the source file for changes and regenerates the code whenever it does.")
     .option("-f, --fallback", "Generates functions which receive a list of fallback languages.")
+    .addOption(
+        new program.Option("-y, --type <type>", "Specifies the type of translation functions which the generated code will use.")
+            .choices([translationTypes.default, translationTypes.custom, translationTypes.both])
+            .default(translationTypes.default))
 
 program.parse(process.argv)
 
 try {
+    const options = program.opts()
     const generate = () => executeCodeGeneration(
-        program.source, program.target, program.watch || program.overwrite, program.fallback)
+        options.source, options.target, options.watch || options.overwrite, options.fallback, options.type)
 
-    if (program.watch) {
-        const writeResult = (msg = `Code generated at ${program.target}`, isSuccess = true) => {
+    if (options.watch) {
+        const writeResult = (msg = `Code generated at ${options.target}`, isSuccess = true) => {
             console.clear()
             // See here for colours: https://stackoverflow.com/a/41407246/10326373
             console.log(`\x1b[3${isSuccess ? "2" : "1"}m%s\x1b[0m`, `${new Date().toLocaleTimeString()} -- ${msg}`)
@@ -48,7 +54,7 @@ try {
 
         // If we got here we ran once successfully, so now watch for file changes. From now, any errors are trapped and
         // reported.
-        fs.watch(program.source, {}, eventType => {
+        fs.watch(options.source, {}, eventType => {
             if (eventType === "change") {
                 try {
                     writeResult(generate())
@@ -60,7 +66,7 @@ try {
 
     } else {
         generate()
-        console.log("\x1b[32m%s\x1b[0m", `Code generated at ${program.target}\n`)
+        console.log("\x1b[32m%s\x1b[0m", `Code generated at ${options.target}\n`)
     }
 } catch (err) {
     if (err instanceof UserError) {

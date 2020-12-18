@@ -47,7 +47,7 @@
     "np": "^7.0.0"
   },
   "dependencies": {
-    "commander": "^6.2.1",
+    "commander": "^7.0.0-2",
     "fs-extra": "^9.0.1"
   }
 }

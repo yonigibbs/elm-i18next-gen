@@ -7,6 +7,7 @@ const buildCode = require("./code-builder")
 const writeFiles = require("./file-writer")
 const UserError = require("./user-error")
 const JsonError = require("./json-error")
+const {translationTypes} = require("./translation-type-utils")
 
 /**
  * Deletes all items from the passed in `parentFolder` which aren't in the passed in `generatedFiles`.
@@ -71,7 +72,9 @@ const canOverwrite = targetFolder => {
  * The main entry point for the whole code generation process. Reads the supplied sourceFile, builds up a model representing
  * the data in it, builds the code for this, and finally writes that code to the file system as the supplied targetFolder.
  */
-module.exports = (sourceFile, targetFolder, overwrite = false, useFallbackLanguages = false) => {
+module.exports = (
+    sourceFile, targetFolder, overwrite = false, useFallbackLanguages = false, translationType = translationTypes.default
+) => {
     const resolvedSourceFile = path.resolve(sourceFile)
     if (!fs.existsSync(resolvedSourceFile))
         throw new UserError(`The supplied source file does not exist: ${resolvedSourceFile}`)
@@ -89,8 +92,8 @@ module.exports = (sourceFile, targetFolder, overwrite = false, useFallbackLangua
         throw new UserError(`Translations already exist in specified target: ${resolvedTargetFolder}. Try again with the 'overwrite' flag?`)
 
     const source = readSourceFile(resolvedSourceFile)
-    const model = buildModel(source)
-    const files = buildCode(model, useFallbackLanguages)
+    const model = buildModel(source, translationType)
+    const files = buildCode(model, useFallbackLanguages, translationType)
 
     if (overwrite) {
         const submodulesFolder = path.join(resolvedTargetFolder, "Translations")

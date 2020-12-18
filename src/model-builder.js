@@ -1,6 +1,7 @@
 "use strict"
 
 const JsonError = require("./json-error")
+const {translationTypes, getCustomFunctionName} = require("./translation-type-utils")
 
 /** Returns a copy of the passed in string with the first letter capitalised/decapitalised, based on the `caps` param. */
 const caseFirstLetter = (s, caps) => {
@@ -80,7 +81,7 @@ const parseParams = translationText => {
  * See documentation on default export below. Does what it says, but allowing the accumulated model and module name to be
  * passed in, so this function can call itself recursively.
  */
-const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.keys(source).reduce(
+const buildModel = (source, translationType, initialModel, moduleName, moduleJsonPath) => Object.keys(source).reduce(
     (accModel, sourcePropKey) => {
         const jsonName = moduleJsonPath ? `${moduleJsonPath}.${sourcePropKey}` : sourcePropKey
         try {
@@ -89,20 +90,43 @@ const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.
                 // Just a string: add a property to the current module in the current model.
                 const module = accModel[moduleName] || []
                 const functionName = sanitiseFunctionName(sourcePropKey)
-                if (module.some(fn => fn.elmName === functionName))
-                    throw new JsonError(`duplicate function found: '${functionName}' (in module '${moduleName}').`)
+                const functions = []
                 const fn = {
                     elmName: functionName,
                     jsonName,
                     parameters: parseParams(sourcePropValue)
                 }
-                return {...accModel, [moduleName]: [...module, fn]}
+                switch (translationType) {
+                    case translationTypes.custom:
+                        // Only generating the custom function
+                        functions.push({...fn, type: translationTypes.custom})
+                        break
+
+                    case translationTypes.both:
+                        // We are going to generate two copies of this function - one with the supplied name, and one with a
+                        // suffix of `Custom`
+                        functions.push({...fn, type: translationTypes.default})
+                        functions.push({...fn, elmName: getCustomFunctionName(functionName), type: translationTypes.custom})
+                        break
+
+                    default:
+                        // Only generating the default function
+                        functions.push({...fn, type: translationTypes.default})
+                        break
+                }
+
+                functions.forEach(fn => {
+                    if (module.some(existingFn => existingFn.elmName === fn.elmName))
+                        throw new JsonError(`duplicate function found: '${fn.elmName}' (in module '${moduleName}').`)
+                })
+
+                return {...accModel, [moduleName]: [...module, ...functions]}
             } else {
                 // This key in the source groups together a bunch of children: create a new module for these.
                 const childModuleName = `${moduleName}.${sanitiseModuleName(sourcePropKey)}`
                 if (accModel[childModuleName])
                     throw new JsonError(`duplicate module found: '${childModuleName}'.`)
-                return buildModel(sourcePropValue, accModel, childModuleName, jsonName)
+                return buildModel(sourcePropValue, translationType, accModel, childModuleName, jsonName)
             }
         } catch (err) {
             if (err instanceof JsonError)
@@ -125,6 +149,8 @@ const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.
  * module. Each entry in this array (i.e. each **function**) has three properties:
  * * `elmName`: the name of this function in the Elm code.
  * * `jsonName`: the name of this function in the source JSON object.
+ * * `type`: "default" or "custom" indicating whether this is to be generated to use the default translation functions
+ *   (`t`/`tr`/`tf`/`trf`) or the custom ones (`customTr`/`customTrf`)
  * * `parameters`: the parameters this function expects.
  * The `elmName` is a sanitised version of the `jsonName`, and in a nested structure contains only the last entry, not
  * the full path.
@@ -167,16 +193,16 @@ const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.
  * ```
  *     {
  *       Translations: [
- *         { elmName: "hello", jsonName: "hello", parameters: []},
- *         { elmName: "helloWithParams", jsonName: "helloWithParams", parameters: [
+ *         { elmName: "hello", jsonName: "hello", type: "default", parameters: []},
+ *         { elmName: "helloWithParams", jsonName: "helloWithParams", type: "default", parameters: [
  *           {elmName: "firstName", jsonName: "first name"},
  *           {elmName: "middleName", jsonName: "middle name"},
  *           {elmName: "lastName", jsonName: "last name"},
  *         ]}
  *       ]
  *       "Translations.Greetings": [
- *         { elmName: "goodDay", jsonName: "greetings.good day", parameters: []},
- *         { elmName: "greetName", jsonName: "greetings.greet name", parameters: [
+ *         { elmName: "goodDay", jsonName: "greetings.good day", type: "default", parameters: []},
+ *         { elmName: "greetName", jsonName: "greetings.greet name", type: "default", parameters: [
  *           {elmName: "name", jsonName: "name"}
  *         ]}
  *       ]
@@ -186,4 +212,5 @@ const buildModel = (source, initialModel, moduleName, moduleJsonPath) => Object.
  * Function, module and parameters names are sanitised. Any duplicate modules or translations in the source JSON will
  * cause an error to be thrown as this is invalid.
  */
-module.exports = source => buildModel(source, {}, "Translations", "")
+module.exports = (source, translationType = translationTypes.default) =>
+    buildModel(source, translationType, {}, "Translations", "")

@@ -67,6 +67,90 @@ greetName translations name =
     },
 
     /**
+     * An object containing the files with the Elm code expected to be generated for the sample JSON file, if custom
+     * translation is chosen.
+     */
+    expectedSampleFileContentCustom: {
+        // Top level module
+        "Translations.elm": `${buildFileStart("Translations", false, "custom")}
+
+hello : Translations -> (String -> a) -> List a
+hello translations nonPlaceholderLift =
+    customTr translations Curly nonPlaceholderLift "hello" []
+
+
+helloWithParams : Translations -> (String -> a) -> a -> a -> a -> List a
+helloWithParams translations nonPlaceholderLift firstname middlename lastname =
+    customTr translations Curly nonPlaceholderLift "helloWithParams" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]
+`,
+
+        // Nested module
+        [`${path.join("Translations", "Greetings.elm")}`]: `${buildFileStart("Translations.Greetings", false, "custom")}
+
+goodDay : Translations -> (String -> a) -> List a
+goodDay translations nonPlaceholderLift =
+    customTr translations Curly nonPlaceholderLift "greetings.goodDay" []
+
+
+greetName : Translations -> (String -> a) -> a -> List a
+greetName translations nonPlaceholderLift name =
+    customTr translations Curly nonPlaceholderLift "greetings.greetName" [ ( "name", name ) ]
+`
+    },
+
+    /**
+     * An object containing the files with the Elm code expected to be generated for the sample JSON file, if both
+     * default and custom translation is chosen.
+     */
+    expectedSampleFileContentBoth: {
+        // Top level module
+        "Translations.elm": `${buildFileStart("Translations", false, "both")}
+
+hello : Translations -> String
+hello translations =
+    t translations "hello"
+
+
+helloCustom : Translations -> (String -> a) -> List a
+helloCustom translations nonPlaceholderLift =
+    customTr translations Curly nonPlaceholderLift "hello" []
+
+
+helloWithParams : Translations -> String -> String -> String -> String
+helloWithParams translations firstname middlename lastname =
+    tr translations Curly "helloWithParams" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]
+
+
+helloWithParamsCustom : Translations -> (String -> a) -> a -> a -> a -> List a
+helloWithParamsCustom translations nonPlaceholderLift firstname middlename lastname =
+    customTr translations Curly nonPlaceholderLift "helloWithParams" [ ( "firstname", firstname ), ( "middlename", middlename ), ( "lastname", lastname ) ]
+`,
+
+        // Nested module
+        [`${path.join("Translations", "Greetings.elm")}`]: `${buildFileStart("Translations.Greetings", false, "both")}
+
+goodDay : Translations -> String
+goodDay translations =
+    t translations "greetings.goodDay"
+
+
+goodDayCustom : Translations -> (String -> a) -> List a
+goodDayCustom translations nonPlaceholderLift =
+    customTr translations Curly nonPlaceholderLift "greetings.goodDay" []
+
+
+greetName : Translations -> String -> String
+greetName translations name =
+    tr translations Curly "greetings.greetName" [ ( "name", name ) ]
+
+
+greetNameCustom : Translations -> (String -> a) -> a -> List a
+greetNameCustom translations nonPlaceholderLift name =
+    customTr translations Curly nonPlaceholderLift "greetings.greetName" [ ( "name", name ) ]
+`
+    },
+
+    /**
      * An object containing the files with the Elm code expected to be generated for the empty-modules JSON file.
      */
     expectedEmptyModulesFileContent: {
